@@ -1,0 +1,19 @@
+****Akcije****
+
++kretanje+
+svaki unit ima svoj movement range, i u toku poteza moze da dosegne bilo koje polje u range-u ukoliko nije okupirano.
++napadanje+
+svaki unit ce moci da napada. U zavisnosti od toga kako napada moze biti melee ili ranged.
+Melee mogu napasti samo neprijatelji koji su im u susednom polju, i ukoliko je jedinica u movement range-u, prvo prelazi put do nje, a zatim izvrsava napadanje.
+Ranged mogu napasti neprijateljske jedinice koji im se nalaze u attack range-u.{da li i njih da tretiram kao melee jedinice? U tom slucaju svi uniti imaju attack range samo melee=1, a ranged >1}
+{Da li da napravim da potez nije gotov dok se ne uradi akcija koja nije kretanje}.
+Ranged dobijaju bonus na attack range i damage ako su na uzvisenju
+Svi uniti dobijaju zastitu od ranged attacka ako su u coveru{da li je dovoljno da budu na polju koje je kao cover ili to da bude kao prepreka u odnosu na koju se racuna}
++specijalne akcije+
+zeleo bih da bude dosta uticanja na hexove
+****Objekti na mapi****
+
++Jedinice
++prepreke
++zaklon
++uzvisenje

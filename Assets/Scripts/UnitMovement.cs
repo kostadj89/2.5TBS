@@ -43,6 +43,7 @@ public class UnitMovement : MonoBehaviour
     #region props
 
     public bool IsMoving { get; private set; }
+    public bool IsMovingToAttack { get; private set; }
 
     #endregion props
 
@@ -89,9 +90,19 @@ public class UnitMovement : MonoBehaviour
             {
                 SetMovingState(false);
 
-                BattlefieldManager.ManagerInstance.EndCurrentPlayingUnitTurn();
+                if (IsMovingToAttack)
+                {
+                    IsMovingToAttack = false;
+                    BattlefieldManager.ManagerInstance.StartAttack();
+                }
+                else
+                {
+                    BattlefieldManager.ManagerInstance.EndCurrentPlayingUnitTurn();
+                }
+                
                 return;
             }
+
             //else current target tile becomes the next tile from the list
             currentTargetTile = path[path.IndexOf(currentTargetTile) - 1];
             currentTargetTilePosition = CalcTilePosition(currentTargetTile);
@@ -110,11 +121,12 @@ public class UnitMovement : MonoBehaviour
     }
 
     //method argument is a list of tiles we got from the path finding algorithm
-    public void StartMoving(List<Tile> path)
+    public void StartMoving(List<Tile> path, bool isMovingToAttack = false)
     {
         if (path.Count == 0)
         {
             SetMovingState(false);
+            IsMovingToAttack = false;
             return;
         }
 
@@ -122,6 +134,7 @@ public class UnitMovement : MonoBehaviour
         currentTargetTile = path[path.Count - 2];
         currentTargetTilePosition = CalcTilePosition(currentTargetTile);
         SetMovingState(true);
+        IsMovingToAttack = isMovingToAttack;
         this.path = path;
     }
 
@@ -144,7 +157,6 @@ public class UnitMovement : MonoBehaviour
         BattlefieldManager.ManagerInstance.ResetTilesInRange();
 
         BattlefieldManager.ManagerInstance.StartingTile = ub.currentTile;
-        //BattlefieldManager.ManagerInstance.SelectTilesInRange(ub.movementRange);
         BattlefieldManager.ManagerInstance.SelectTilesInRangeSimple(ub.movementRange);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class TileBehaviour : MonoBehaviour
@@ -56,7 +57,7 @@ public class TileBehaviour : MonoBehaviour
                 //ChangeHexVisual(MouseOverColor, SelectedSprite);
             }
 
-            BattlefieldManager.ManagerInstance.GenerateAndShowPath(false);
+            BattlefieldManager.ManagerInstance.GenerateAndShowPath();
         }
     }
 
@@ -77,7 +78,10 @@ public class TileBehaviour : MonoBehaviour
             //we color the selected path to real white
             ChangeHexVisual(Color.white, SelectedSprite);
 
-            BattlefieldManager.ManagerInstance.GenerateAndShowPath(true);
+            BattlefieldManager.ManagerInstance.GenerateAndShowPath();
+
+            var path = Pathfinder.FindPath(BattlefieldManager.ManagerInstance.StartingTile.OwningTile, BattlefieldManager.ManagerInstance.DestinationTile.OwningTile);
+            UnitMovement.instance.StartMoving(path.ToList());
         }
     }
 

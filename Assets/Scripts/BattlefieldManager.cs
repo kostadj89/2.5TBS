@@ -48,6 +48,8 @@ public class BattlefieldManager : MonoBehaviour
     public List<GameObject> InstantiatedUnits;
     //unit whose turn it is
     public GameObject CurrentlySelectedPlayingUnit;
+    //unit who is a target of an action
+    public UnitBehaviour TargetedUnit;
 
     //Path
     //game object which represents lines of path, dots
@@ -160,13 +162,25 @@ public class BattlefieldManager : MonoBehaviour
         DestinationTile = null;
 
         //...this destroys path when the unit reaches destination...
-        GenerateAndShowPath(false);
-
+        GenerateAndShowPath();
+        
         ub.HideUnitUI();
+
+        //detarget targeted unit
+        if (TargetedUnit != null)
+        {
+            TargetedUnit.HideUnitUI();
+            TargetedUnit = null;
+        }
 
         //...selects next playing unit...
         SelectNextPlayingUnit();
         StartCurrentlyPlayingUnitTurn();
+    }
+
+    public TileBehaviour GeTileBehaviourFromPoint(Point tileLocation)
+    {
+        return Board[tileLocation];
     }
 
     public void ResetTilesInRange()
@@ -266,7 +280,10 @@ public class BattlefieldManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>().TakeDamage(1);
+        }
     }
 
     #endregion Overrides
@@ -398,7 +415,7 @@ public class BattlefieldManager : MonoBehaviour
 
     #region Public Methods
 
-    public void GenerateAndShowPath(bool startMoving)
+    public void GenerateAndShowPath()//bool startMoving)
     {
         if (StartingTile==null || (DestinationTile == null))
         {
@@ -409,12 +426,25 @@ public class BattlefieldManager : MonoBehaviour
         var path = Pathfinder.FindPath(StartingTile.OwningTile, DestinationTile.OwningTile);
         DrawPath(path);
 
-        if (startMoving)
-        {
-            UnitMovement.instance.StartMoving(path.ToList());
-        }
+        //if (startMoving)
+        //{
+        //    UnitMovement.instance.StartMoving(path.ToList());
+        //}
     }
 
+    public void StartAttack()
+    {
+        //get currently playing unit's behaviour
+        UnitBehaviour currentPlayingUnit = CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>();
+
+        //we show targeted unit's ui, and damage it
+        TargetedUnit.TakeDamage(currentPlayingUnit.Damage);
+
+        //damage attacking unit with relation strike damage
+        currentPlayingUnit.TakeDamage((int) (TargetedUnit.Damage * 0.5));
+
+        BattlefieldManager.ManagerInstance.EndCurrentPlayingUnitTurn();
+    }
     #endregion Public Methods
 
 

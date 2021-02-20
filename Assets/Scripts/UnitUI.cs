@@ -5,27 +5,51 @@ using UnityEngine.UI;
 
 public class UnitUI : MonoBehaviour
 {
-    public Text movementPointsText;
+    public Text healthPointsText;
+
+    public GameObject HealthBar;
+    private UIHealthBar uiHealthBar;
+
+    void Awake()
+    {
+        uiHealthBar = HealthBar.GetComponent<UIHealthBar>();
+        DisableUnitUI();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        // movementPointsText = gameObject.GetComponentInChildren<Text>();
-        DisableUnitUI();
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        movementPointsText.transform.position = Camera.main.WorldToScreenPoint(this.transform.position);
+        healthPointsText.transform.position = Camera.main.WorldToScreenPoint(this.transform.position);
+        HealthBar.transform.position = Camera.main.WorldToScreenPoint(this.transform.position);
     }
 
     public void EnableUnitUI()
     {
-        movementPointsText.enabled = true;
+        healthPointsText.enabled = true;
+        HealthBar.SetActive(true);
     }
 
     public void DisableUnitUI()
     {
-        movementPointsText.enabled = false;
+        healthPointsText.enabled = false;
+        HealthBar.SetActive(false);
+    }
+
+    public void SetUIHealth(int health)
+    {
+        uiHealthBar.SetCurrentHealth(health);
+        healthPointsText.text = health.ToString();
+    }
+
+    public void SetUIMaxHealth(int health)
+    {
+        uiHealthBar.SetMaxHealth(health);
+        healthPointsText.text = health.ToString();
     }
 }

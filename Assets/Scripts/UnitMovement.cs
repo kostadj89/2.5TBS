@@ -11,8 +11,8 @@ public class UnitMovement : MonoBehaviour
 
     //tile and position of the tile we are moving to 
     private Vector3 currentTargetTilePosition;
-    private Tile currentTargetTile;
-    private List<Tile> path;
+    private HexTile currentTargetTile;
+    private List<HexTile> path;
 
     //i want to have only one object of script of this type, and pass it around units, so these two fields are gonna be transform of creature whose turn is now
     private Transform owningUnitTransform;
@@ -112,7 +112,7 @@ public class UnitMovement : MonoBehaviour
         owningUnitTransform.position = Vector3.MoveTowards(owningUnitTransform.position, currentTargetTilePosition, Time.deltaTime * speed);
     }
 
-    public Vector3 CalcTilePosition(Tile tile)
+    public Vector3 CalcTilePosition(HexTile tile)
     {
         Vector2 tileGridPosition = new Vector2(tile.X, tile.Y);
         Vector3 tilePos = BattlefieldManager.ManagerInstance.GetUnitAnchorFromATileOnBoard(tileGridPosition);
@@ -121,7 +121,7 @@ public class UnitMovement : MonoBehaviour
     }
 
     //method argument is a list of tiles we got from the path finding algorithm
-    public void StartMoving(List<Tile> path, bool isMovingToAttack = false)
+    public void StartMoving(List<HexTile> path, bool isMovingToAttack = false)
     {
         if (path.Count == 0)
         {
@@ -131,16 +131,23 @@ public class UnitMovement : MonoBehaviour
         }
 
         //the first tile we need to reach is actually in the end of the list just before the one the unit is currently on, the unit is on path[path.Count - 1];
-        currentTargetTile = path[path.Count - 2];
+        if (isMovingToAttack && path.Count == 1)
+        {
+            currentTargetTile = path[0];
+        }
+        else
+        {
+            currentTargetTile = path[path.Count - 2];
+        }
         currentTargetTilePosition = CalcTilePosition(currentTargetTile);
         SetMovingState(true);
         IsMovingToAttack = isMovingToAttack;
         this.path = path;
     }
 
-    public void SetupCurrentlyOwningUnit(GameObject currOwningUnit, UnitBehaviour ub)
+    public void SetupCurrentlyOwningUnit( UnitBehaviour ub)
     {
-        owningUnit = currOwningUnit;
+        owningUnit = ub.gameObject;
 
         //caching the transform for better performance
         owningUnitTransform = owningUnit.transform;
@@ -156,7 +163,7 @@ public class UnitMovement : MonoBehaviour
         //ResetTilesInRange resets tiles which were in movement range of previous unit
         BattlefieldManager.ManagerInstance.ResetTilesInRange();
 
-        BattlefieldManager.ManagerInstance.StartingTile = ub.currentTile;
+        BattlefieldManager.ManagerInstance.StartingTile = ub.CurrentHexTile;
         BattlefieldManager.ManagerInstance.SelectTilesInRangeSimple(ub.movementRange);
     }
 }

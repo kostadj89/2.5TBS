@@ -576,7 +576,6 @@ MonoBehaviour:
   rotationSpeed: 0.004
   initiative: 2
   movementRange: 2
-  currentTile: {fileID: 0}
   MaxHealth: 10
   CurrentHealth: 10
   Damage: 2

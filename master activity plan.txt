@@ -1,0 +1,59 @@
+
+=====================Current Plans==============================
+
+1.Dodam ostale Battlefield Object-e: obcastle, full-cover (magla), cover-provider, hazard(damaging, slowing),
+2.Napravim tip melee i ranged unit
+3.refaktor koda
+4. AI - minimax
+5. AI - Utility
+6. Art change
+7. Music
+8. Animations
+9. UI
+
+=====================Current Plans==============================
+
+
+=====================Old Plans==============================
+napravim ovaj grid, kretanje na gridu i model za tiles
+napravim likove crtanje i animacija i unit script
+napravim kretanje unita
+dodajem vise tipova unita, dele skript ali mozda za njih da napravim nove
+napravim da uniti mogu da se napadaju, doadam turnove i inicijativu
+napravim posebna polja, prepreke, covere
+napravim ai
+
+-------------------
+Master
+napraviti unit skriptu koja ce imati referencu na unit movement (ili ce biti referncirana u unit movement) i izmeniti unit movement ako treba (done for now)
+Napraviti da gridmanager ima listu unita koji ucestvuju u borbi, i da ima raspored kojim odredjuje koji unit ima turn(done for now)
+dodati drugog unita i napraviti da se krecu naizmenicno(done for now)
+napraviti da se selektuje polje na kom unit pocinje trenutni turn.(done for now)
+napraviti da se osence polja po kojima moze da se krece
+da kada se krece unit ne moze da se klikne negde(done for now)
+-----------------------------------------------------------------
+ispravke
+
+
+-----------------------------------------------------------------------------
+
+*highlighting da sredim dakle kada hoverujwm preko selected da se vrati u higlighted(shadowed izgled)
+*da pogledam kako radi outline
+*refactor tile i tilebehaviour, zasto sam ih razdvajao?
+*da kad unit zavrsi sa kretanjem nestanu njegovi higlightovani hexovi, i da oni ne budu movable za sledeceg unita(done)
+*da implemntiram napad:
++GetEnemies koji dohvata sve neprijatelje koji su reachable u ovom potezu. Za Melee unit oni do kojih postoji putanja, videti kako napraviti to isTileReachable.
++Dodati health i UI za health, kao i damage(moze i ui za damage)
++dodati number of movement points
++ok za sada melee napad, koji funkcionise ovako.
+*tu ce biti neki damage sistem, videti da li treba retaliation, i polako ubaciti ranged, pa abilities
+*ovde videti akcije, tj sistem akcija
+*onda AI, Minimax i Utility
+-----------------------------
+0,5 0,6 0,7
+1,4 1,5 1,6, 1,7
+2,3 2,4 2,5 2,6 2,7
+3,3 3,4 3,5 3,6
+4,3 4,4 4,5
+
+=====================Old Plans==============================

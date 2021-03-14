@@ -79,7 +79,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_Sprite: {fileID: 2732468819877449583, guid: 9862153efac04e94cb410639fdbbf581,
     type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.57254905}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -101,10 +101,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6f812ec707877246884c0e129676b80, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OriginalSprite: {fileID: 0}
-  SelectedSprite: {fileID: -5140596878153620060, guid: df0e7ea5a865ac34aad6a89735b8f15d,
+  TileBehaviourSpriteRenderer: {fileID: 0}
+  NormalLookingHex: {fileID: 0}
+  SelectedLookingHex: {fileID: -5140596878153620060, guid: df0e7ea5a865ac34aad6a89735b8f15d,
+    type: 3}
+  HazardousLookingHex: {fileID: -6483104679331078662, guid: 3989f21a5d052044eae79d043d8f5107,
     type: 3}
   coordinates: 
+  UnitAnchorWorldPositionVector: {x: 0, y: 0, z: 0}
 --- !u!60 &2931352990427049199
 PolygonCollider2D:
   m_ObjectHideFlags: 0

@@ -401,7 +401,12 @@ MonoBehaviour:
   UnitsToPlace:
   - {fileID: 2306844897146346355, guid: 765f8126533927c4d98ec9a20bf7375c, type: 3}
   - {fileID: 2306844897146346355, guid: 765f8126533927c4d98ec9a20bf7375c, type: 3}
+  BattlefieldObjectToPlace: {fileID: 1065609779880414884, guid: b8f5bf964c17dc648a36309000b0494b,
+    type: 3}
+  InstantiatedUnits: []
+  InstantiatedBattlefieldObjects: []
   CurrentlySelectedPlayingUnit: {fileID: 0}
+  TargetedUnit: {fileID: 0}
   PathLine: {fileID: 2541797487724233691, guid: 62e1e09afd14654449fe1ec17dcf3a50,
     type: 3}
   Path: []

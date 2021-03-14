@@ -46,5 +46,5 @@ public abstract class GridObject
 
 public interface IHasNeighbours<N>
 {
-    IEnumerable<N> Neighbours { get; }
+    IEnumerable<N> AvailableNeighbours { get; }
 }

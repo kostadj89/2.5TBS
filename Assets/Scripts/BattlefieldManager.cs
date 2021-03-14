@@ -38,16 +38,19 @@ public class BattlefieldManager : MonoBehaviour
     public static BattlefieldManager ManagerInstance = null;
 
     //Tile and Tile behaviour
-    public Tile SelectedTile = null;
-    public TileBehaviour StartingTile = null;
-    public TileBehaviour DestinationTile = null;
+    public HexTile SelectedTile = null;
+    public HexBehaviour StartingTile = null;
+    public HexBehaviour DestinationTile = null;
 
     //List of units to be placed on the board, not instantiated
     public GameObject[] UnitsToPlace;
-
+    //List Of BattlefieldObjects
+    public GameObject BattlefieldObjectToPlace;
     public List<GameObject> InstantiatedUnits;
+
+    public List<GameObject> InstantiatedBattlefieldObjects;
     //unit whose turn it is
-    public GameObject CurrentlySelectedPlayingUnit;
+    public UnitBehaviour CurrentlySelectedPlayingUnit;
     //unit who is a target of an action
     public UnitBehaviour TargetedUnit;
 
@@ -59,7 +62,7 @@ public class BattlefieldManager : MonoBehaviour
     public List<GameObject> Path;
 
     //Board
-    private Dictionary<Point, TileBehaviour> Board;
+    private Dictionary<Point, HexBehaviour> Board;
 
 
     #endregion Props
@@ -79,8 +82,67 @@ public class BattlefieldManager : MonoBehaviour
         SetHexSize();
         CalculateInitialPosition();
         CreateGrid();
+        SetupBattlefieldObjects();
         SetupUnits();
+        SetHazadoursTiles();
+       
+        //setup first playing unit
+        CurrentlySelectedPlayingUnit = InstantiatedUnits[0].GetComponent<UnitBehaviour>();
+        StartCurrentlyPlayingUnitTurn();
+    }
+
+    private void SetHazadoursTiles()
+    {
+        int intRandom = Random.Range(25, 30);
+        int rX, rY;
+        Point p;
+        HexBehaviour hb;
         
+        int i = 0;
+        while( i < intRandom)
+        {
+            rX = Random.Range(1, 8);
+            rY = Random.Range(1, 8);
+
+            p = new Point(rX, rY);
+
+            hb = Board[p];
+
+            if (hb.OwningTile.Passable && !hb.OwningTile.Occupied)
+            {
+                hb.OwningTile.Hazadours = true;
+                hb.ChangeHexVisual(Color.yellow, hb.HazardousLookingHex);
+                i++;
+            }
+        }
+    }
+
+    private void SetupBattlefieldObjects()
+    {
+        int intRandom = Random.Range(5, 10);
+        int rX, rY;
+        Point p;
+
+        InstantiatedBattlefieldObjects = new List<GameObject>();
+
+        GameObject currentBattlefieldObject;
+        BattlefieldObject battlefieldObject;
+
+        for (int i = 0; i < intRandom; i++)
+        {
+           rX = Random.Range(0, 5);
+           rY = Random.Range(0, 5);
+ 
+           p = new Point(rX, rY);
+
+           currentBattlefieldObject =
+               Instantiate(BattlefieldObjectToPlace, Board[p].transform.position, Quaternion.identity);
+
+           battlefieldObject = currentBattlefieldObject.GetComponent<BattlefieldObject>();
+           battlefieldObject.CurrentHexTile = Board[p];
+           Board[p].OwningTile.Passable = false;
+           InstantiatedBattlefieldObjects.Add(currentBattlefieldObject);
+        }
     }
 
     //Called once on Start of the battle, it takes all the units instantiates them, sorts them by the initiative and places them on the battlefield
@@ -99,24 +161,27 @@ public class BattlefieldManager : MonoBehaviour
 
             if (i % 2 == 1) k++;
 
-            PlaceUnitOnCoordinates(unitGameObject, placementPoint);
+            UnitBehaviour ub = unitGameObject.GetComponent<UnitBehaviour>();
+            SetupPlayerId(ub,i);
+            PlaceUnitOnCoordinates(ub, placementPoint);
 
             //add to instantiated list
             InstantiatedUnits.Add(unitGameObject);
+
         }
 
         //ordering by initiative
         InstantiatedUnits.OrderByDescending(x => x.GetComponent<UnitBehaviour>());
+    }
 
-        //setup first playing unit
-        CurrentlySelectedPlayingUnit = InstantiatedUnits[0];
-
-        StartCurrentlyPlayingUnitTurn();
+    private void SetupPlayerId(UnitBehaviour ub, int i)
+    {
+        ub.PlayerId = i % 2;
     }
 
     public void SelectNextPlayingUnit()
     {
-        int currentIndex = InstantiatedUnits.IndexOf(CurrentlySelectedPlayingUnit);
+        int currentIndex = InstantiatedUnits.IndexOf(CurrentlySelectedPlayingUnit.gameObject);
         int nextIndex;
 
         if (currentIndex == InstantiatedUnits.Count-1)
@@ -128,37 +193,40 @@ public class BattlefieldManager : MonoBehaviour
             nextIndex = currentIndex + 1;
         }
 
-        CurrentlySelectedPlayingUnit = InstantiatedUnits[nextIndex];
+        CurrentlySelectedPlayingUnit = InstantiatedUnits[nextIndex].GetComponent<UnitBehaviour>();
     }
 
     private void StartCurrentlyPlayingUnitTurn()
     {
-        UnitBehaviour ub = CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>();
-        StartingTile = ub.currentTile;
+        //UnitBehaviour ub = CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>();
+        StartingTile = CurrentlySelectedPlayingUnit.CurrentHexTile;
         StartingTile.ChangeVisualToSelected();
 
         //shows currently playing unit's ui
-        ub.ShowUnitUI();
+        CurrentlySelectedPlayingUnit.ShowUnitUI();
 
-        UnitMovement.instance.SetupCurrentlyOwningUnit(CurrentlySelectedPlayingUnit, ub);
+        UnitMovement.instance.SetupCurrentlyOwningUnit(CurrentlySelectedPlayingUnit);
     }
     
 
     public void EndCurrentPlayingUnitTurn()
     {
         //don't know if this is necessary
-        StartingTile.ChangeHexVisual(Color.white, StartingTile.OriginalSprite);
-        DestinationTile.ChangeHexVisual(Color.white, DestinationTile.OriginalSprite);
-        
+        StartingTile.ChangeHexVisualToDeselected();
+        DestinationTile.ChangeHexVisualToDeselected();
+
         //movement stuff...
         UnitBehaviour ub = CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>();
         //...setting previously occupied tile back to being passable...
-        ub.currentTile.OwningTile.Passable = true;
+        ub.CurrentHexTile.OwningTile.Occupied = false;
+        ub.CurrentHexTile.ObjectOnHex = null;
         //...setting previous destination tile to be new current for moving unit and marking it as notpassable... 
-        ub.currentTile = DestinationTile;
-        ub.currentTile.OwningTile.Passable = false;
-        //...reseting starting and destination tiles in order to destroy path...
-        StartingTile = null;
+        ub.CurrentHexTile = DestinationTile;
+
+        ub.CurrentHexTile.OwningTile.Occupied = true;
+        ub.CurrentHexTile.ObjectOnHex = ub;
+       //...reseting starting and destination tiles in order to destroy path...
+       StartingTile = null;
         DestinationTile = null;
 
         //...this destroys path when the unit reaches destination...
@@ -178,18 +246,18 @@ public class BattlefieldManager : MonoBehaviour
         StartCurrentlyPlayingUnitTurn();
     }
 
-    public TileBehaviour GeTileBehaviourFromPoint(Point tileLocation)
+    public HexBehaviour GeTileBehaviourFromPoint(Point tileLocation)
     {
         return Board[tileLocation];
     }
 
     public void ResetTilesInRange()
     {
-        List<TileBehaviour> previousTilesInRange = Board.Values.Where(x => x.OwningTile.IsInRange == true).ToList();
-        foreach (TileBehaviour tile in previousTilesInRange)
+        List<HexBehaviour> previousTilesInRange = Board.Values.Where(x => x.OwningTile.IsInRange == true).ToList();
+        foreach (HexBehaviour tile in previousTilesInRange)
         {
             tile.OwningTile.IsInRange = false;
-            tile.ChangeHexVisual(Color.white, tile.OriginalSprite);
+            tile.ChangeHexVisualToDeselected();
         }
     }
 
@@ -201,16 +269,16 @@ public class BattlefieldManager : MonoBehaviour
         }
 
         Point currentUnitPoint = Board.FirstOrDefault(x => x.Value == this.StartingTile).Key;
-        List<TileBehaviour> reachableTiles = Board.Values.Where(b =>
+        List<HexBehaviour> reachableTiles = Board.Values.Where(b =>
             Vector3.Distance(this.StartingTile.UnitAnchorWorldPositionVector, b.UnitAnchorWorldPositionVector) <=
             movementRange * DISTANCE_BETWEEN_HEXES).ToList();
 
-        foreach (TileBehaviour reachableTile in reachableTiles)
+        foreach (HexBehaviour reachableTile in reachableTiles)
         {
             if (reachableTile.OwningTile.Passable)
             {
                 reachableTile.OwningTile.IsInRange = true;
-                reachableTile.ChangeHexVisual(Color.gray, reachableTile.OriginalSprite);
+                reachableTile.ChangeHexVisual(Color.gray);
             }
 
             //Debug.Log("Distance from (" + currentUnitPoint.X.ToString() + ", " + currentUnitPoint.Y.ToString() + ") to the (" + i + ", " + j + ") is: " + Vector3.Distance(StartingTile.UnitAnchorWorldPositionVector, reachableTile.UnitAnchorWorldPositionVector));
@@ -237,7 +305,7 @@ public class BattlefieldManager : MonoBehaviour
 
         //}
 
-        TileBehaviour selectedTileBehaviour = null;
+        HexBehaviour selectedTileBehaviour = null;
 
         //i is row index, j is column index 
         for (int i = currentUnitPoint.X-movementRange; i < currentUnitPoint.X+movementRange+1; i++)
@@ -258,7 +326,7 @@ public class BattlefieldManager : MonoBehaviour
                         if (selectedTileBehaviour.OwningTile.Passable)
                         {
                             selectedTileBehaviour.OwningTile.IsInRange = true;
-                            selectedTileBehaviour.ChangeHexVisual(Color.gray, selectedTileBehaviour.OriginalSprite);
+                            selectedTileBehaviour.ChangeHexVisual(Color.gray);
 
                             Debug.Log("Distance from (" + currentUnitPoint.X.ToString() + ", " + currentUnitPoint.Y.ToString() + ") to the (" +i+", "+ j +") is: "+ Vector3.Distance(StartingTile.UnitAnchorWorldPositionVector, selectedTileBehaviour.UnitAnchorWorldPositionVector));
                         }
@@ -268,13 +336,14 @@ public class BattlefieldManager : MonoBehaviour
         }
     }
 
-    private void PlaceUnitOnCoordinates(GameObject unitGameObject, Point placementPoint)
+    private void PlaceUnitOnCoordinates(UnitBehaviour ub, Point placementPoint)
     {
-        unitGameObject.transform.position = Board[placementPoint].UnitAnchorWorldPositionVector;
+        ub.transform.position = Board[placementPoint].UnitAnchorWorldPositionVector;
 
-        UnitBehaviour ub = unitGameObject.GetComponent<UnitBehaviour>();
-        ub.currentTile = Board[placementPoint];
-        ub.currentTile.OwningTile.Passable = false;
+        
+        ub.CurrentHexTile = Board[placementPoint];
+        ub.CurrentHexTile.OwningTile.Occupied = true;
+        ub.CurrentHexTile.ObjectOnHex = ub;
     }
 
     // Update is called once per frame
@@ -301,7 +370,7 @@ public class BattlefieldManager : MonoBehaviour
         //Vector2 gridSize = 
         GameObject HexGridGO = new GameObject("HexGrid");
 
-        Board = new Dictionary<Point, TileBehaviour>();
+        Board = new Dictionary<Point, HexBehaviour>();
 
         for (int y = 0; y < gridHeightInHexes; y++)
         {
@@ -313,8 +382,8 @@ public class BattlefieldManager : MonoBehaviour
                 hex.transform.parent = HexGridGO.transform;
                 
                 //temp assigning Tile behaviour
-                TileBehaviour tb = (TileBehaviour)hex.GetComponent("TileBehaviour");
-                tb.OwningTile = new Tile((int)x - (int)(y / 2), (int)y);
+                HexBehaviour tb = (HexBehaviour)hex.GetComponent("HexBehaviour");
+                tb.OwningTile = new HexTile((int)x - (int)(y / 2), (int)y);
                 tb.coordinates = tb.OwningTile.ToString();
                 //tb.UnitAnchorWorldPositionVector = hex.transform.position;
 
@@ -338,7 +407,7 @@ public class BattlefieldManager : MonoBehaviour
         }
         
         //Neighboring tile coordinates of all the tiles are calculated
-        foreach (TileBehaviour behaviour in Board.Values)
+        foreach (HexBehaviour behaviour in Board.Values)
             behaviour.OwningTile.FindNeighbours(Board, new Vector2(gridWidthInHexes, gridHeightInHexes));
     }
 
@@ -348,14 +417,14 @@ public class BattlefieldManager : MonoBehaviour
         return Board[targetPoint].UnitAnchorWorldPositionVector;
     }
 
-    private void SetHexSprite(GameObject hex, TileBehaviour tb)
+    private void SetHexSprite(GameObject hex, HexBehaviour tb)
     {
         SpriteRenderer hexSpriteRenderer = hex.GetComponent<SpriteRenderer>();
         int randomSpriteIndex = 0 + Random.Range(1, sprites.Length) * Random.Range(0, 2);
 
         hexSpriteRenderer.sprite = sprites[randomSpriteIndex];
 
-        tb.OriginalSprite = hexSpriteRenderer.sprite;
+        tb.NormalLookingHex = hexSpriteRenderer.sprite;
     }
 
     public Vector3 CalculateWorldCoordinates(Vector2 gridPos)
@@ -380,7 +449,7 @@ public class BattlefieldManager : MonoBehaviour
         hexHeight = Hex.GetComponent<SpriteRenderer>().bounds.size.y;
     }
 
-    private void DrawPath(IEnumerable<Tile> pathTiles)
+    private void DrawPath(IEnumerable<HexTile> pathTiles)
     {
         if (this.Path == null)
         {
@@ -396,7 +465,7 @@ public class BattlefieldManager : MonoBehaviour
             Lines = new GameObject("Lines");
         }
 
-        foreach (Tile tile  in pathTiles)
+        foreach (HexTile tile  in pathTiles)
         {
             //didn't want to make start and destination tiles visible, but i'm not sure this is the right way to do it
             if (tile!=StartingTile.OwningTile && tile != DestinationTile.OwningTile)
@@ -419,7 +488,7 @@ public class BattlefieldManager : MonoBehaviour
     {
         if (StartingTile==null || (DestinationTile == null))
         {
-            DrawPath(new List<Tile>());
+            DrawPath(new List<HexTile>());
             return;
         }
 

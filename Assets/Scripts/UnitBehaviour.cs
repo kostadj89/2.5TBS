@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts;
 using UnityEngine;
 
 public enum UnitAction
@@ -12,7 +13,7 @@ public enum UnitAction
     Special
 }
 
-public class UnitBehaviour : MonoBehaviour
+public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
 {
     //Movement, speed will probably be replaced with tilesPerTurn
     public float speed = 0.0025f;
@@ -22,7 +23,7 @@ public class UnitBehaviour : MonoBehaviour
     //number of tiles unit can cover in single move action
     public int movementRange = 3;
 
-    public TileBehaviour currentTile;
+    private HexBehaviour currentHexTile;
     //Attributes
     public int MaxHealth;
     public int CurrentHealth;
@@ -41,6 +42,12 @@ public class UnitBehaviour : MonoBehaviour
     public int PlayerId;
 
     private UnitUI unitUI;
+
+    public HexBehaviour CurrentHexTile
+    {
+        get { return currentHexTile; }
+        set { currentHexTile = value; }
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -63,68 +70,21 @@ public class UnitBehaviour : MonoBehaviour
     //The corresponding OnMouseOver function is called while the mouse stays over the object and OnMouseExit is called when it moves away.
     void OnMouseEnter()
     {
-        //if (!UnitMovement.instance.IsMoving)
-        //{
-        //    if (!currentTile.OwningTile.IsInRange || !currentTile.OwningTile.Passable)
-        //    {
-        //       // ChangeDestinationToStart();
-        //    }
-        //    else if (currentTile.OwningTile.Passable && this != BattlefieldManager.ManagerInstance.DestinationTile && this != BattlefieldManager.ManagerInstance.StartingTile)
-        //    {
-        //       // //we're generating the path each time we hover over potential destination tile
-        //        //ChangeDestinationToThis();
-        //        //ChangeHexVisual(MouseOverColor, SelectedSprite);
-        //    }
-
-        //    BattlefieldManager.ManagerInstance.GenerateAndShowPath();
-        //}
-
         Debug.Log(gameObject.ToString() + " MouseEnter");
     }
 
     void OnMouseExit()
     {
-        ////if (OwningTile.Passable  && this != BattlefieldManager.ManagerInstance.DestinationTile && this != BattlefieldManager.ManagerInstance.StartingTile)
-        //if (OwningTile.Passable && OwningTile.IsInRange && this != BattlefieldManager.ManagerInstance.StartingTile && !UnitMovement.instance.IsMoving)
-        //{
-        //    ChangeHexVisual(Color.gray, OriginalSprite);
-        //    //BattlefieldManager.ManagerInstance.GenerateAndShowPath(false);
-        //}
         Debug.Log(gameObject.ToString() + " MouseExit");
     }
 
 
     void OnMouseOver()
     {
-        if (Input.GetMouseButtonUp(0) && !UnitMovement.instance.IsMoving && gameObject != BattlefieldManager.ManagerInstance.CurrentlySelectedPlayingUnit)
+        if (Input.GetMouseButtonUp(0) && !UnitMovement.instance.IsMoving && PlayerId != BattlefieldManager.ManagerInstance.CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>().PlayerId)
         {
-            /*Ok here we'll take all neighbours which are passable and in range, and move to the closest one*/
-            List<Tile> neighbourTiles = currentTile.OwningTile.Neighbours.Where(x => x.IsInRange).ToList();
-
-            if (neighbourTiles!=null && neighbourTiles.Count>0)
-            {
-                //we color the selected path to real white
-                //BattlefieldManager.ManagerInstance.DestinationTile = currentTile;
-                currentTile.ChangeHexVisual(Color.red, currentTile.SelectedSprite);
-
-                //need to se how to get min distanced tile, for now this
-                Tile minDistanceTile = neighbourTiles.First();
-
-                TileBehaviour targetTileBehaviour =
-                    BattlefieldManager.ManagerInstance.GeTileBehaviourFromPoint(minDistanceTile.Location);
-
-
-                BattlefieldManager.ManagerInstance.DestinationTile = targetTileBehaviour;
-                targetTileBehaviour.ChangeHexVisual(Color.white, targetTileBehaviour.SelectedSprite);
-                BattlefieldManager.ManagerInstance.GenerateAndShowPath();
-
-                BattlefieldManager.ManagerInstance.TargetedUnit = gameObject.GetComponent<UnitBehaviour>();
-
-                BattlefieldManager.ManagerInstance.TargetedUnit.ShowUnitUI();
-
-                var path = Pathfinder.FindPath(BattlefieldManager.ManagerInstance.StartingTile.OwningTile, BattlefieldManager.ManagerInstance.DestinationTile.OwningTile);
-                UnitMovement.instance.StartMoving(path.ToList(), true);
-            }
+            BattlefieldManager.ManagerInstance.DestinationTile = currentHexTile;
+            currentHexTile.PrepareToStartMoving();
         }
         Debug.Log(gameObject.ToString() + " MouseOver");
     }

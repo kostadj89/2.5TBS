@@ -82,45 +82,50 @@ public class PriorityQueue<P, V>
 
 public static class Pathfinder
 {
-    public static Path<Tile> FindPath(Tile start, Tile destination)
+    public static Path<HexTile> FindPath(HexTile start, HexTile destination)
     {
-        HashSet<Tile> closed = new HashSet<Tile>();
+        bool DestinationIsOcupied = destination.Occupied;
 
-        PriorityQueue<double, Path<Tile>> queue = new PriorityQueue<double,Path<Tile>>();
-        queue.Enqueue(0, new Path<Tile>(start));
+        destination.Occupied = false;
+        HashSet<HexTile> closed = new HashSet<HexTile>();
+
+        PriorityQueue<double, Path<HexTile>> queue = new PriorityQueue<double,Path<HexTile>>();
+        queue.Enqueue(0, new Path<HexTile>(start));
 
         while (!queue.IsEmpty)
         {
-            Path<Tile> path = queue.Dequeue();
+            Path<HexTile> path = queue.Dequeue();
 
             if (closed.Contains(path.LastStep))
                 continue;
 
             if (path.LastStep.Equals(destination))
             {
+                destination.Occupied = DestinationIsOcupied;
                 return path;
             }
 
             closed.Add(path.LastStep);
 
-            foreach (Tile tile in path.LastStep.Neighbours)
+            foreach (HexTile tile in path.LastStep.AvailableNeighbours)
             {
                 double d = Distance(path.LastStep, tile);
-                Path<Tile> newPath = path.AddStep(tile, d);
+                Path<HexTile> newPath = path.AddStep(tile, d+ (tile.Hazadours ? 1.5 : 0));
                 queue.Enqueue(newPath.TotalCost + Estimate(tile,destination), newPath);
             }
         }
 
+        destination.Occupied = DestinationIsOcupied;
         return null;
 
     }
 
-    private static double Estimate(Tile tile1, Tile tile2)
+    private static double Estimate(HexTile tile1, HexTile tile2)
     {
-        return 1;
+        return 1;//tile1.Hazadours?15:1;
     }
 
-    private static double Distance(Tile tile, Tile destTile)
+    private static double Distance(HexTile tile, HexTile destTile)
     {
         float dx = Mathf.Abs(destTile.X - tile.X);
         float dy = Mathf.Abs(destTile.Y - tile.Y);

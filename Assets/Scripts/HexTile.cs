@@ -5,15 +5,19 @@ using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
-public class Tile : GridObject, IHasNeighbours<Tile>
+public class HexTile : GridObject, IHasNeighbours<HexTile>
 {
     public bool Passable;
     public bool IsInRange;
+    public bool Occupied;
+    public bool Hazadours;
 
-    public Tile(int x, int y)
+    public HexTile(int x, int y)
         :base(x, y)
     {
         Passable = true;
+        Occupied = false;
+        Hazadours = false;
     }
 
     public static List<Point> NeighbourShift
@@ -32,14 +36,14 @@ public class Tile : GridObject, IHasNeighbours<Tile>
         }
     }
 
-    public IEnumerable<Tile> AllNeighbours;
+    public IEnumerable<HexTile> AllNeighbours;
 
-    public IEnumerable<Tile> Neighbours => AllNeighbours.Where(o => o.Passable);
+    public IEnumerable<HexTile> AvailableNeighbours => AllNeighbours.Where(o => o.Passable && o.IsInRange && !o.Occupied);
 
     //fills each tile with data for its neighbours
-    public void FindNeighbours(Dictionary<Point, TileBehaviour> board, Vector2 boardSize)
+    public void FindNeighbours(Dictionary<Point, HexBehaviour> board, Vector2 boardSize)
     {
-        List<Tile> neighbours = new List<Tile>();
+        List<HexTile> neighbours = new List<HexTile>();
 
         foreach (Point point in NeighbourShift)
         {
@@ -59,5 +63,11 @@ public class Tile : GridObject, IHasNeighbours<Tile>
         }
 
         AllNeighbours = neighbours;
+    }
+
+    public HexBehaviour GetHexBehaviour()
+    {
+        Point p = new Point(this.X, this.Y);
+        return BattlefieldManager.ManagerInstance.GeTileBehaviourFromPoint(p);
     }
 }

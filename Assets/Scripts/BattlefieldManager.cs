@@ -106,13 +106,16 @@ public class BattlefieldManager : MonoBehaviour
 
             p = new Point(rX, rY);
 
-            hb = Board[p];
-
-            if (hb.OwningTile.Passable && !hb.OwningTile.Occupied)
+            if (Board.ContainsKey(p))
             {
-                hb.OwningTile.Hazadours = true;
-                hb.ChangeHexVisual(Color.yellow, hb.HazardousLookingHex);
-                i++;
+                hb = Board[p];
+
+                if (hb.OwningTile.Passable && !hb.OwningTile.Occupied)
+                {
+                    hb.OwningTile.Hazadours = true;
+                    hb.ChangeHexVisual(Color.yellow, hb.HazardousLookingHex);
+                    i++;
+                }
             }
         }
     }
@@ -251,6 +254,13 @@ public class BattlefieldManager : MonoBehaviour
         return Board[tileLocation];
     }
 
+    public void GetAllEnemiesInRange()
+    {
+        //temporary this will only work for melee units whose attack range is 1
+        //List<GameObject> enemiesInRange = InstantiatedUnits.Where(x=>x.GetComponent<UnitBehaviour>().CurrentHexTile.OwningTile.IsInRange )
+    }
+
+    //resets all tiles
     public void ResetTilesInRange()
     {
         List<HexBehaviour> previousTilesInRange = Board.Values.Where(x => x.OwningTile.IsInRange == true).ToList();
@@ -261,6 +271,7 @@ public class BattlefieldManager : MonoBehaviour
         }
     }
 
+    //select all tiles in range and marks them as in range
     internal void SelectTilesInRangeSimple(int movementRange)
     {
         if (!Board.ContainsValue(this.StartingTile))
@@ -411,6 +422,7 @@ public class BattlefieldManager : MonoBehaviour
             behaviour.OwningTile.FindNeighbours(Board, new Vector2(gridWidthInHexes, gridHeightInHexes));
     }
 
+    //probbably redundant
     internal Vector3 GetUnitAnchorFromATileOnBoard(Vector2 tileGridPosition)
     {
         Point targetPoint = new Point((int)tileGridPosition.x, (int)tileGridPosition.y);
@@ -484,6 +496,7 @@ public class BattlefieldManager : MonoBehaviour
 
     #region Public Methods
 
+    //creates and draws the path
     public void GenerateAndShowPath()//bool startMoving)
     {
         if (StartingTile==null || (DestinationTile == null))
@@ -501,6 +514,7 @@ public class BattlefieldManager : MonoBehaviour
         //}
     }
 
+    //handles attack
     public void StartAttack()
     {
         //get currently playing unit's behaviour

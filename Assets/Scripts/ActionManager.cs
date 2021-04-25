@@ -60,7 +60,7 @@ public class ActionManager : MonoBehaviour
 
     private void SetMovingState(bool v)
     {
-        IsMoving = v;
+        CurrentlySelectedPlayingUnit.CurrentState = UnitState.Moving;
 
         if (!v)
         {
@@ -82,39 +82,53 @@ public class ActionManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!IsMoving)
-        {
-            return;
-        }
+        //if (CurrentlySelectedPlayingUnit.CurrentState!= UnitState.Moving)
+        //{
+        //    return;
+        //}
 
-        //if the distance between the character and the center of the next tile is short enough
-        if ((currentTargetTilePosition - owningUnitTransform.position).sqrMagnitude < MinNextTileDist * MinNextTileDist)
+        switch (CurrentlySelectedPlayingUnit.CurrentState)
         {
-            //if we reach the destination tile
-            if (path.IndexOf(currentTargetTile)==0)
-            {
-                SetMovingState(false);
-
-                if (IsMovingToAttack)
-                {
-                    IsMovingToAttack = false;
-                    StartAttack();
-                }
-                else
-                {
-                    EndCurrentPlayingUnitTurn();
-                }
+            case UnitState.Moving:
                 
-                return;
-            }
+                //if the distance between the character and the center of the next tile is short enough
+                if ((currentTargetTilePosition - owningUnitTransform.position).sqrMagnitude < MinNextTileDist * MinNextTileDist)
+                {
+                    //if we reach the destination tile
+                    if (path.IndexOf(currentTargetTile) == 0)
+                    {
+                        if (IsMovingToAttack)
+                        {
+                            CurrentlySelectedPlayingUnit.CurrentState = UnitState.Attacking;
+                            IsMovingToAttack = false;
+                            StartAttack();
+                        }
+                        else
+                        {
+                            EndCurrentPlayingUnitTurn();
+                        }
 
-            //else current target tile becomes the next tile from the list
-            currentTargetTile = path[path.IndexOf(currentTargetTile) - 1];
-            currentTargetTilePosition = CalcTilePosition(currentTargetTile);
+                        return;
+                    }
+
+                    //else current target tile becomes the next tile from the list
+                    currentTargetTile = path[path.IndexOf(currentTargetTile) - 1];
+                    currentTargetTilePosition = CalcTilePosition(currentTargetTile);
+                }
+
+                //MoveTowardsPosition(currentTargetTilePosition);
+                owningUnitTransform.position = Vector3.MoveTowards(owningUnitTransform.position, currentTargetTilePosition, Time.deltaTime * speed);
+                break;
+            case UnitState.Attacking:
+                break;
+            case UnitState.CastingSpell:
+                break;
+            case UnitState.Flanking:
+                break;
+            case UnitState.Idle:
+                break;
         }
-
-        //MoveTowardsPosition(currentTargetTilePosition);
-        owningUnitTransform.position = Vector3.MoveTowards(owningUnitTransform.position, currentTargetTilePosition, Time.deltaTime * speed);
+       
     }
 
     public void StartUnitActionOnHex(HexBehaviour targetHexBehaviour)
@@ -165,14 +179,14 @@ public class ActionManager : MonoBehaviour
                 BattlefieldManager.ManagerInstance.DestinationTile = path.LastStep.GetHexBehaviour();
                 //we color the selected path to real white
                 BattlefieldManager.ManagerInstance.DestinationTile.ChangeHexVisual(Color.white, targetHexBehaviour.SelectedLookingHex);
-                ActionManager.Instance.StartMoving(path.ToList(), true);
+                StartMoving(path.ToList(), true);
             }
         }
         else
         {
             //we color the selected path to real white
             targetHexBehaviour.ChangeHexVisual(Color.white, targetHexBehaviour.SelectedLookingHex);
-            ActionManager.Instance.StartMoving(path.ToList());
+            StartMoving(path.ToList());
         }
     }
 
@@ -181,7 +195,7 @@ public class ActionManager : MonoBehaviour
     {
         if (path.Count == 0)
         {
-            SetMovingState(false);
+            //SetMovingState(false);
             IsMovingToAttack = false;
             return;
         }
@@ -205,6 +219,8 @@ public class ActionManager : MonoBehaviour
     //handles attack
     public void StartAttack()
     {
+        //
+        CurrentlySelectedPlayingUnit.CurrentState = UnitState.Attacking;
         //we show targeted unit's ui, and damage it
         TargetedUnit.TakeDamage(CurrentlySelectedPlayingUnit.Damage);
 
@@ -215,9 +231,11 @@ public class ActionManager : MonoBehaviour
     }
 
     #region turn management
+
+    // selects next unit in instantiated queque 
     public void SelectNextPlayingUnit()
     {
-        int currentIndex = BattlefieldManager.ManagerInstance.InstantiatedUnits.IndexOf(ActionManager.Instance.OwningUnit);
+        int currentIndex = BattlefieldManager.ManagerInstance.InstantiatedUnits.IndexOf(OwningUnit);
         int nextIndex;
 
         if (currentIndex == BattlefieldManager.ManagerInstance.InstantiatedUnits.Count - 1)
@@ -260,7 +278,6 @@ public class ActionManager : MonoBehaviour
         SetupCurrentlyOwningUnit(CurrentlySelectedPlayingUnit);
     }
 
-
     public void EndCurrentPlayingUnitTurn()
     {
         //don't know if this is necessary
@@ -284,6 +301,7 @@ public class ActionManager : MonoBehaviour
         BattlefieldManager.ManagerInstance.GenerateAndShowPath();
 
         CurrentlySelectedPlayingUnit.HideUnitUI();
+        CurrentlySelectedPlayingUnit.CurrentState = UnitState.Idle;
 
         //detarget targeted unit
         if (TargetedUnit != null)
@@ -296,9 +314,8 @@ public class ActionManager : MonoBehaviour
         SelectNextPlayingUnit();
         StartCurrentlyPlayingUnitTurn();
     }
-    #endregion
 
-    public void SetupCurrentlyOwningUnit( UnitBehaviour ub)
+    public void SetupCurrentlyOwningUnit(UnitBehaviour ub)
     {
         OwningUnit = ub.gameObject;
         CurrentlySelectedPlayingUnit = ub;
@@ -308,8 +325,8 @@ public class ActionManager : MonoBehaviour
 
         //animation setup
         owningUnitAnimator = OwningUnit.GetComponent<Animator>();
-        
-        SetMovingState(false);
+
+        //SetMovingState(false);
 
         speed = ub.speed;
         rotationSpeed = ub.rotationSpeed;
@@ -320,4 +337,6 @@ public class ActionManager : MonoBehaviour
         BattlefieldManager.ManagerInstance.StartingTile = ub.CurrentHexTile;
         BattlefieldManager.ManagerInstance.SelectTilesInRangeSimple(ub.movementRange);
     }
+
+    #endregion turn management
 }

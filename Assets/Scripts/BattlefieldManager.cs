@@ -497,7 +497,7 @@ public class BattlefieldManager : MonoBehaviour
     #region Public Methods
 
     //creates and draws the path
-    public void GenerateAndShowPath()//bool startMoving)
+    public void GenerateAndShowPath()
     {
         if (StartingTile==null || (DestinationTile == null))
         {
@@ -507,11 +507,6 @@ public class BattlefieldManager : MonoBehaviour
 
         var path = Pathfinder.FindPath(StartingTile.OwningTile, DestinationTile.OwningTile);
         DrawPath(path);
-
-        //if (startMoving)
-        //{
-        //    UnitMovement.instance.StartMoving(path.ToList());
-        //}
     }
 
     //handles attack

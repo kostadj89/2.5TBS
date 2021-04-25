@@ -130,15 +130,16 @@ public class UnitMovement : MonoBehaviour
             return;
         }
 
-        //the first tile we need to reach is actually in the end of the list just before the one the unit is currently on, the unit is on path[path.Count - 1];
+        //the first tile we need to reach is actually path[path.Count - 2], near the end of the list just before the one the unit is currently on, the unit is on path[path.Count - 1];
         if (isMovingToAttack && path.Count == 1)
         {
             currentTargetTile = path[0];
         }
         else
         {
-            currentTargetTile = path[path.Count - 2];
+            currentTargetTile = path[path.Count - 1];
         }
+
         currentTargetTilePosition = CalcTilePosition(currentTargetTile);
         SetMovingState(true);
         IsMovingToAttack = isMovingToAttack;

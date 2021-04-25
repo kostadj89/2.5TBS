@@ -79,6 +79,7 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
     }
 
 
+    //if we click on unit we get his tile as possible destination field instead
     void OnMouseOver()
     {
         if (Input.GetMouseButtonUp(0) && !UnitMovement.instance.IsMoving && PlayerId != BattlefieldManager.ManagerInstance.CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>().PlayerId)

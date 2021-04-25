@@ -575,7 +575,7 @@ MonoBehaviour:
   speed: 3
   rotationSpeed: 0.004
   initiative: 2
-  movementRange: 2
+  movementRange: 4
   MaxHealth: 10
   CurrentHealth: 10
   Damage: 2

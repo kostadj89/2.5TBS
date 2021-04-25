@@ -13,6 +13,15 @@ public enum UnitAction
     Special
 }
 
+public enum UnitState
+{
+    Idle,
+    Moving,
+    Attacking,
+    CastingSpell,
+    Flanking
+}
+
 public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
 {
     //Movement, speed will probably be replaced with tilesPerTurn
@@ -36,7 +45,7 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
     public bool hasAttacked;
 
     //actions
-    protected UnitAction[] availableActions = {UnitAction.Move, UnitAction.Wait, UnitAction.Attack};
+    protected UnitAction[] availableActions = {UnitAction.Move, UnitAction.Wait, UnitAction.Attack };
 
     //player
     public int PlayerId;

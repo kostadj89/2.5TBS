@@ -50,9 +50,7 @@ public class BattlefieldManager : MonoBehaviour
 
     public List<GameObject> InstantiatedBattlefieldObjects;
     //unit whose turn it is
-    public UnitBehaviour CurrentlySelectedPlayingUnit;
-    //unit who is a target of an action
-    public UnitBehaviour TargetedUnit;
+
 
     //Path
     //game object which represents lines of path, dots
@@ -87,8 +85,7 @@ public class BattlefieldManager : MonoBehaviour
         SetHazadoursTiles();
        
         //setup first playing unit
-        CurrentlySelectedPlayingUnit = InstantiatedUnits[0].GetComponent<UnitBehaviour>();
-        StartCurrentlyPlayingUnitTurn();
+        ActionManager.Instance.StartCurrentlyPlayingUnitTurn(InstantiatedUnits[0].GetComponent<UnitBehaviour>());
     }
 
     private void SetHazadoursTiles()
@@ -180,73 +177,6 @@ public class BattlefieldManager : MonoBehaviour
     private void SetupPlayerId(UnitBehaviour ub, int i)
     {
         ub.PlayerId = i % 2;
-    }
-
-    public void SelectNextPlayingUnit()
-    {
-        int currentIndex = InstantiatedUnits.IndexOf(CurrentlySelectedPlayingUnit.gameObject);
-        int nextIndex;
-
-        if (currentIndex == InstantiatedUnits.Count-1)
-        {
-            nextIndex = 0;
-        }
-        else
-        {
-            nextIndex = currentIndex + 1;
-        }
-
-        CurrentlySelectedPlayingUnit = InstantiatedUnits[nextIndex].GetComponent<UnitBehaviour>();
-    }
-
-    private void StartCurrentlyPlayingUnitTurn()
-    {
-        //UnitBehaviour ub = CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>();
-        StartingTile = CurrentlySelectedPlayingUnit.CurrentHexTile;
-        StartingTile.ChangeVisualToSelected();
-
-        //shows currently playing unit's ui
-        CurrentlySelectedPlayingUnit.ShowUnitUI();
-
-        UnitMovement.instance.SetupCurrentlyOwningUnit(CurrentlySelectedPlayingUnit);
-    }
-    
-
-    public void EndCurrentPlayingUnitTurn()
-    {
-        //don't know if this is necessary
-        StartingTile.ChangeHexVisualToDeselected();
-        DestinationTile.ChangeHexVisualToDeselected();
-
-        //movement stuff...
-        UnitBehaviour ub = CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>();
-        //...setting previously occupied tile back to being passable...
-        ub.CurrentHexTile.OwningTile.Occupied = false;
-        ub.CurrentHexTile.ObjectOnHex = null;
-        //...setting previous destination tile to be new current for moving unit and marking it as notpassable... 
-        ub.CurrentHexTile = DestinationTile;
-
-        ub.CurrentHexTile.OwningTile.Occupied = true;
-        ub.CurrentHexTile.ObjectOnHex = ub;
-       //...reseting starting and destination tiles in order to destroy path...
-       StartingTile = null;
-        DestinationTile = null;
-
-        //...this destroys path when the unit reaches destination...
-        GenerateAndShowPath();
-        
-        ub.HideUnitUI();
-
-        //detarget targeted unit
-        if (TargetedUnit != null)
-        {
-            TargetedUnit.HideUnitUI();
-            TargetedUnit = null;
-        }
-
-        //...selects next playing unit...
-        SelectNextPlayingUnit();
-        StartCurrentlyPlayingUnitTurn();
     }
 
     public HexBehaviour GeTileBehaviourFromPoint(Point tileLocation)
@@ -347,6 +277,12 @@ public class BattlefieldManager : MonoBehaviour
         }
     }
 
+    public void SetupStartingTile(HexBehaviour currentHexTile)
+    {
+        BattlefieldManager.ManagerInstance.StartingTile = currentHexTile;
+        BattlefieldManager.ManagerInstance.StartingTile.ChangeVisualToSelected();
+    }
+
     private void PlaceUnitOnCoordinates(UnitBehaviour ub, Point placementPoint)
     {
         ub.transform.position = Board[placementPoint].UnitAnchorWorldPositionVector;
@@ -360,10 +296,10 @@ public class BattlefieldManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>().TakeDamage(1);
-        }
+        //if (Input.GetKeyDown(KeyCode.Space))
+        //{
+        //    CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>().TakeDamage(1);
+        //}
     }
 
     #endregion Overrides
@@ -509,20 +445,7 @@ public class BattlefieldManager : MonoBehaviour
         DrawPath(path);
     }
 
-    //handles attack
-    public void StartAttack()
-    {
-        //get currently playing unit's behaviour
-        UnitBehaviour currentPlayingUnit = CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>();
-
-        //we show targeted unit's ui, and damage it
-        TargetedUnit.TakeDamage(currentPlayingUnit.Damage);
-
-        //damage attacking unit with relation strike damage
-        currentPlayingUnit.TakeDamage((int) (TargetedUnit.Damage * 0.5));
-
-        BattlefieldManager.ManagerInstance.EndCurrentPlayingUnitTurn();
-    }
+    
     #endregion Public Methods
 
 

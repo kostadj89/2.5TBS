@@ -46,6 +46,8 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
 
     //actions
     protected UnitAction[] availableActions = {UnitAction.Move, UnitAction.Wait, UnitAction.Attack };
+    //unitState
+    public UnitState CurrentState;
 
     //player
     public int PlayerId;
@@ -63,9 +65,10 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
     {
         unitUI = gameObject.GetComponentInChildren<UnitUI>();
         SetupUI();
+        CurrentState = UnitState.Idle;
     }
 
-    private void SetupUI()
+private void SetupUI()
     {
         unitUI.SetUIMaxHealth(MaxHealth);
     }
@@ -91,11 +94,12 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
     //if we click on unit we get his tile as possible destination field instead
     void OnMouseOver()
     {
-        if (Input.GetMouseButtonUp(0) && !UnitMovement.instance.IsMoving && PlayerId != BattlefieldManager.ManagerInstance.CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>().PlayerId)
+        if (Input.GetMouseButtonUp(0) && !ActionManager.Instance.IsMoving && PlayerId != ActionManager.Instance.CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>().PlayerId)
         {
             BattlefieldManager.ManagerInstance.DestinationTile = currentHexTile;
-            currentHexTile.PrepareToStartMoving();
+            ActionManager.Instance.StartUnitActionOnHex(currentHexTile);
         }
+
         Debug.Log(gameObject.ToString() + " MouseOver");
     }
 

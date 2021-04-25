@@ -57,7 +57,7 @@ public class HexBehaviour : MonoBehaviour
     //The corresponding OnMouseOver function is called while the mouse stays over the object and OnMouseExit is called when it moves away.
     void OnMouseEnter()
     {
-        if (!UnitMovement.instance.IsMoving)
+        if (!ActionManager.Instance.IsMoving)
         {
             if (!OwningTile.IsInRange || !OwningTile.Passable)
             {
@@ -81,7 +81,7 @@ public class HexBehaviour : MonoBehaviour
     void OnMouseExit()
     {
         //if (OwningTile.Passable  && this != BattlefieldManager.ManagerInstance.DestinationTile && this != BattlefieldManager.ManagerInstance.StartingTile)
-        if (OwningTile.Passable && OwningTile.IsInRange && this != BattlefieldManager.ManagerInstance.StartingTile && !UnitMovement.instance.IsMoving)
+        if (OwningTile.Passable && OwningTile.IsInRange && this != BattlefieldManager.ManagerInstance.StartingTile && !ActionManager.Instance.IsMoving)
         {
             if (this.OwningTile.Hazadours)
             {
@@ -96,41 +96,9 @@ public class HexBehaviour : MonoBehaviour
 
     void OnMouseOver()
     {
-        if (Input.GetMouseButtonUp(0) && !UnitMovement.instance.IsMoving && OwningTile.Passable && OwningTile.IsInRange)
+        if (Input.GetMouseButtonUp(0) && !ActionManager.Instance.IsMoving && OwningTile.Passable && OwningTile.IsInRange)
         {
-            PrepareToStartMoving();
-        }
-    }
-
-    //have to solve moving to allied units
-    public void PrepareToStartMoving()
-    {
-        BattlefieldManager.ManagerInstance.GenerateAndShowPath();
-
-        var path = Pathfinder.FindPath(BattlefieldManager.ManagerInstance.StartingTile.OwningTile, BattlefieldManager.ManagerInstance.DestinationTile.OwningTile);
-
-        if (BattlefieldManager.ManagerInstance.DestinationTile.OwningTile.Occupied)
-        {
-            UnitBehaviour ub = (UnitBehaviour)BattlefieldManager.ManagerInstance.DestinationTile.ObjectOnHex;
-
-            if (ub.PlayerId != BattlefieldManager.ManagerInstance.CurrentlySelectedPlayingUnit.PlayerId)
-            {
-                BattlefieldManager.ManagerInstance.DestinationTile.ChangeHexVisual(Color.red, SelectedLookingHex);
-                BattlefieldManager.ManagerInstance.TargetedUnit = ub;
-
-                path = path.PreviousSteps;
-
-                BattlefieldManager.ManagerInstance.DestinationTile = path.LastStep.GetHexBehaviour();
-                //we color the selected path to real white
-                BattlefieldManager.ManagerInstance.DestinationTile.ChangeHexVisual(Color.white, SelectedLookingHex);
-                UnitMovement.instance.StartMoving(path.ToList(), true);
-            }
-        }
-        else
-        {
-            //we color the selected path to real white
-            ChangeHexVisual(Color.white, SelectedLookingHex);
-            UnitMovement.instance.StartMoving(path.ToList());
+            ActionManager.Instance.StartUnitActionOnHex(this);
         }
     }
 

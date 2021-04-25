@@ -575,13 +575,14 @@ MonoBehaviour:
   speed: 3
   rotationSpeed: 0.004
   initiative: 2
-  movementRange: 4
+  movementRange: 2
   MaxHealth: 10
   CurrentHealth: 10
   Damage: 2
   isAlive: 1
   attackRange: 0
   hasAttacked: 0
+  CurrentState: 0
   PlayerId: 0
 --- !u!1 &2537150503247626556
 GameObject:

@@ -38,7 +38,8 @@ public class HexTile : GridObject, IHasNeighbours<HexTile>
 
     public IEnumerable<HexTile> AllNeighbours;
 
-    public IEnumerable<HexTile> AvailableNeighbours => AllNeighbours.Where(o => o.Passable && o.IsInRange && !o.Occupied);
+    public IEnumerable<HexTile> InRangeNeighbours => AllNeighbours.Where(o => o.Passable && o.IsInRange);// && !o.Occupied);
+    public IEnumerable<HexTile> ReachableNeighbours => AllNeighbours.Where(o => o.Passable && o.IsInRange && !o.Occupied);
 
     //fills each tile with data for its neighbours
     public void FindNeighbours(Dictionary<Point, HexBehaviour> board, Vector2 boardSize)

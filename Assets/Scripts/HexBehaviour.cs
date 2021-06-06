@@ -17,6 +17,8 @@ public class HexBehaviour : MonoBehaviour
     public Sprite NormalLookingHex;
     public Sprite SelectedLookingHex;
     public Sprite HazardousLookingHex;
+    public Sprite ReachableLookingHex;
+    public Sprite OcuppiedLookingHex;
 
     Color MouseOverColor = new Color(255f/255f, 255f / 255f, 255f / 255f, 127f/255f);
 
@@ -37,41 +39,56 @@ public class HexBehaviour : MonoBehaviour
         ChangeHexVisual(Color.white, SelectedLookingHex);
     }
 
-    public void ChangeHexVisual(Color color, Sprite sprite)
+    public void ChangeHexVisualToDeselected()
+    {
+        ChangeHexVisual(Color.white, this.OwningTile.Hazadours ? HazardousLookingHex : NormalLookingHex);
+    }
+
+    public void ChangeHexVisualToHazardous()
+    {
+        ChangeHexVisual(Color.yellow, HazardousLookingHex);
+    }
+
+    public void ChangeHexVisualToOccupied()
+    {
+        ChangeHexVisual(Color.red, OcuppiedLookingHex);
+    }
+
+    public void ChangeVisualToReachable()
+    {
+        ChangeHexVisual(Color.white, ReachableLookingHex);
+    }
+
+    public void ChangeVisualToNormal()
+    {
+        ChangeHexVisual(Color.white, NormalLookingHex);
+    }
+
+    private void ChangeHexVisual(Color color, Sprite sprite)
     {
         TileBehaviourSpriteRenderer.material.color = color;
         TileBehaviourSpriteRenderer.sprite = sprite;
     }
 
-    public void ChangeHexVisual(Color color)
+    private void ChangeHexVisual(Color color)
     {
         TileBehaviourSpriteRenderer.material.color = color;
     }
 
-    public void ChangeHexVisualToDeselected()
-    {
-        TileBehaviourSpriteRenderer.material.color = Color.white;
-        TileBehaviourSpriteRenderer.sprite = this.OwningTile.Hazadours ? HazardousLookingHex : NormalLookingHex;
-    }
 
     //The corresponding OnMouseOver function is called while the mouse stays over the object and OnMouseExit is called when it moves away.
     void OnMouseEnter()
     {
         if (!ActionManager.Instance.IsMoving)
         {
-            if (!OwningTile.IsInRange || !OwningTile.Passable)
+            if ((OwningTile.IsInRange && OwningTile.Passable && this != BattlefieldManager.ManagerInstance.DestinationTile && this != BattlefieldManager.ManagerInstance.StartingTile)||(OwningTile.Occupied && OwningTile.ReachableNeighbours.Count()>0))
             {
-                ChangeDestinationToStart();
+                ChangeDestinationToThis();
             }
             //we're generating the path each time we hover over potential destination tile
-            else if (OwningTile.Passable && this != BattlefieldManager.ManagerInstance.DestinationTile && this != BattlefieldManager.ManagerInstance.StartingTile)
+            else //if (!OwningTile.IsInRange || !OwningTile.Passable)
             {
-                if (OwningTile.Occupied)
-                {
-                    
-                }
-                
-                ChangeDestinationToThis();
+                ChangeDestinationToStart();
             }
 
             BattlefieldManager.ManagerInstance.GenerateAndShowPath();
@@ -85,18 +102,18 @@ public class HexBehaviour : MonoBehaviour
         {
             if (this.OwningTile.Hazadours)
             {
-                ChangeHexVisual(Color.gray,HazardousLookingHex);
+                ChangeHexVisualToHazardous();
             }
             else
             {
-                ChangeHexVisual(Color.gray, NormalLookingHex);
+                ChangeVisualToReachable();
             }
         }
     }
 
     void OnMouseOver()
     {
-        if (Input.GetMouseButtonUp(0) && !ActionManager.Instance.IsMoving && OwningTile.Passable && OwningTile.IsInRange)
+        if (Input.GetMouseButtonUp(0) && !ActionManager.Instance.IsMoving && ((OwningTile.Passable && OwningTile.IsInRange) || (OwningTile.Occupied && OwningTile.ReachableNeighbours.Count() > 0)))
         {
             ActionManager.Instance.StartUnitActionOnHex(this);
         }
@@ -104,17 +121,9 @@ public class HexBehaviour : MonoBehaviour
 
     public void ChangeDestinationToThis()
     {
-        //HexBehaviour destination = BattlefieldManager.ManagerInstance.DestinationTile;
-
-        //if (this == destination)
-        //{
-        //    BattlefieldManager.ManagerInstance.DestinationTile = null;
-        //    TileBehaviourSpriteRenderer.color = Color.white;
-        //    return;
-        //}
-
         // we change the actual destination tile to the current one
         BattlefieldManager.ManagerInstance.DestinationTile = this;
+        Debug.Log("ChangeDestinationToThis(), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
         ChangeHexVisual(MouseOverColor, SelectedLookingHex);
     }
 
@@ -122,6 +131,8 @@ public class HexBehaviour : MonoBehaviour
     private void ChangeDestinationToStart()
     {
         BattlefieldManager.ManagerInstance.DestinationTile = BattlefieldManager.ManagerInstance.StartingTile;
+        Debug.Log("ChangeDestinationToStart(), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
+
     }
 
     private void StartingTileChanged(HexBehaviour origin)
@@ -129,13 +140,16 @@ public class HexBehaviour : MonoBehaviour
         if (this == origin)
         {
             BattlefieldManager.ManagerInstance.StartingTile = null;
+            Debug.Log("StartingTileChanged(HexBehaviour origin), should be null, StartingTile: " + (BattlefieldManager.ManagerInstance.StartingTile ? BattlefieldManager.ManagerInstance.StartingTile.coordinates : "null"));
             TileBehaviourSpriteRenderer.sprite = NormalLookingHex;
             return;
         }
 
         BattlefieldManager.ManagerInstance.StartingTile = this;
+        Debug.Log("StartingTileChanged(HexBehaviour origin), StartingTile: " + (BattlefieldManager.ManagerInstance.StartingTile ? BattlefieldManager.ManagerInstance.StartingTile.coordinates : "null"));
         ChangeVisualToSelected();
     }
+
 }
 
 public interface IIsOnHexGrid

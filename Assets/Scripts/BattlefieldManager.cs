@@ -82,7 +82,7 @@ public class BattlefieldManager : MonoBehaviour
         CreateGrid();
         SetupBattlefieldObjects();
         SetupUnits();
-        SetHazadoursTiles();
+       // SetHazadoursTiles();
        
         //setup first playing unit
         ActionManager.Instance.StartCurrentlyPlayingUnitTurn(InstantiatedUnits[0].GetComponent<UnitBehaviour>());
@@ -110,7 +110,7 @@ public class BattlefieldManager : MonoBehaviour
                 if (hb.OwningTile.Passable && !hb.OwningTile.Occupied)
                 {
                     hb.OwningTile.Hazadours = true;
-                    hb.ChangeHexVisual(Color.yellow, hb.HazardousLookingHex);
+                    hb.ChangeHexVisualToHazardous();
                     i++;
                 }
             }
@@ -164,6 +164,8 @@ public class BattlefieldManager : MonoBehaviour
             UnitBehaviour ub = unitGameObject.GetComponent<UnitBehaviour>();
             SetupPlayerId(ub,i);
             PlaceUnitOnCoordinates(ub, placementPoint);
+            //Show UI
+            ub.ShowUnitUI();
 
             //add to instantiated list
             InstantiatedUnits.Add(unitGameObject);
@@ -219,7 +221,8 @@ public class BattlefieldManager : MonoBehaviour
             if (reachableTile.OwningTile.Passable)
             {
                 reachableTile.OwningTile.IsInRange = true;
-                reachableTile.ChangeHexVisual(Color.gray);
+               
+                reachableTile.ChangeVisualToReachable();
             }
 
             //Debug.Log("Distance from (" + currentUnitPoint.X.ToString() + ", " + currentUnitPoint.Y.ToString() + ") to the (" + i + ", " + j + ") is: " + Vector3.Distance(StartingTile.UnitAnchorWorldPositionVector, reachableTile.UnitAnchorWorldPositionVector));
@@ -267,7 +270,7 @@ public class BattlefieldManager : MonoBehaviour
                         if (selectedTileBehaviour.OwningTile.Passable)
                         {
                             selectedTileBehaviour.OwningTile.IsInRange = true;
-                            selectedTileBehaviour.ChangeHexVisual(Color.gray);
+                            //selectedTileBehaviour.ChangeHexVisual(Color.cyan);
 
                             Debug.Log("Distance from (" + currentUnitPoint.X.ToString() + ", " + currentUnitPoint.Y.ToString() + ") to the (" +i+", "+ j +") is: "+ Vector3.Distance(StartingTile.UnitAnchorWorldPositionVector, selectedTileBehaviour.UnitAnchorWorldPositionVector));
                         }
@@ -279,8 +282,8 @@ public class BattlefieldManager : MonoBehaviour
 
     public void SetupStartingTile(HexBehaviour currentHexTile)
     {
-        BattlefieldManager.ManagerInstance.StartingTile = currentHexTile;
-        BattlefieldManager.ManagerInstance.StartingTile.ChangeVisualToSelected();
+        StartingTile = currentHexTile;
+        StartingTile.ChangeVisualToSelected();
     }
 
     private void PlaceUnitOnCoordinates(UnitBehaviour ub, Point placementPoint)
@@ -445,7 +448,6 @@ public class BattlefieldManager : MonoBehaviour
         DrawPath(path);
     }
 
-    
     #endregion Public Methods
 
 

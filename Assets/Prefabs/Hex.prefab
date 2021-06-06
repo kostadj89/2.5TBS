@@ -79,7 +79,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_Sprite: {fileID: 2732468819877449583, guid: 9862153efac04e94cb410639fdbbf581,
     type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 0.57254905}
+  m_Color: {r: 0.7686275, g: 0.7686275, b: 0.7686275, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -105,7 +105,11 @@ MonoBehaviour:
   NormalLookingHex: {fileID: 0}
   SelectedLookingHex: {fileID: -5140596878153620060, guid: df0e7ea5a865ac34aad6a89735b8f15d,
     type: 3}
-  HazardousLookingHex: {fileID: -6483104679331078662, guid: 3989f21a5d052044eae79d043d8f5107,
+  HazardousLookingHex: {fileID: -3701464314775917962, guid: 8bd4d1af752e5614d9b6b7f82be48875,
+    type: 3}
+  ReachableLookingHex: {fileID: 6546440935676544230, guid: 8bd4d1af752e5614d9b6b7f82be48875,
+    type: 3}
+  OcuppiedLookingHex: {fileID: -736573848797279266, guid: 8bd4d1af752e5614d9b6b7f82be48875,
     type: 3}
   coordinates: 
   UnitAnchorWorldPositionVector: {x: 0, y: 0, z: 0}

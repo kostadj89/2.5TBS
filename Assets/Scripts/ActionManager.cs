@@ -47,7 +47,10 @@ public class ActionManager : MonoBehaviour
 
     #region props
 
-    public bool IsMoving { get; private set; }
+    public bool IsMoving
+    {
+        get { return CurrentlySelectedPlayingUnit.CurrentState == UnitState.Moving; }
+    }
     public bool IsMovingToAttack { get; private set; }
 
     #endregion props
@@ -58,19 +61,16 @@ public class ActionManager : MonoBehaviour
         Instance = this;
     }
 
-    private void SetMovingState(bool v)
+    private void SetMovingState()
     {
         CurrentlySelectedPlayingUnit.CurrentState = UnitState.Moving;
+        owningUnitAnimator.Play("walking");
+    }
 
-        if (!v)
-        {
-            owningUnitAnimator.Play("idle");
-        }
-        else
-        {
-            owningUnitAnimator.Play("walking");
-        }
-        
+    private void SetIdleState()
+    {
+        CurrentlySelectedPlayingUnit.CurrentState = UnitState.Idle;
+        owningUnitAnimator.Play("Idle");
     }
 
     // Start is called before the first frame update
@@ -99,7 +99,6 @@ public class ActionManager : MonoBehaviour
                     {
                         if (IsMovingToAttack)
                         {
-                            CurrentlySelectedPlayingUnit.CurrentState = UnitState.Attacking;
                             IsMovingToAttack = false;
                             StartAttack();
                         }
@@ -171,21 +170,22 @@ public class ActionManager : MonoBehaviour
 
             if (ub.PlayerId != CurrentlySelectedPlayingUnit.PlayerId)
             {
-                BattlefieldManager.ManagerInstance.DestinationTile.ChangeHexVisual(Color.red, targetHexBehaviour.SelectedLookingHex);
+                BattlefieldManager.ManagerInstance.DestinationTile.ChangeHexVisualToOccupied();
                TargetedUnit = ub;
 
-                path = path.PreviousSteps;
+                //path = path.PreviousSteps;
 
-                BattlefieldManager.ManagerInstance.DestinationTile = path.LastStep.GetHexBehaviour();
+                BattlefieldManager.ManagerInstance.DestinationTile = path==null? BattlefieldManager.ManagerInstance.StartingTile : path.LastStep.GetHexBehaviour();
+                Debug.Log("PrepareToStartMoving(HexBehaviour targetHexBehaviour), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
                 //we color the selected path to real white
-                BattlefieldManager.ManagerInstance.DestinationTile.ChangeHexVisual(Color.white, targetHexBehaviour.SelectedLookingHex);
+                BattlefieldManager.ManagerInstance.DestinationTile.ChangeVisualToSelected();
                 StartMoving(path.ToList(), true);
             }
         }
         else
         {
             //we color the selected path to real white
-            targetHexBehaviour.ChangeHexVisual(Color.white, targetHexBehaviour.SelectedLookingHex);
+            targetHexBehaviour.ChangeVisualToSelected();
             StartMoving(path.ToList());
         }
     }
@@ -195,7 +195,7 @@ public class ActionManager : MonoBehaviour
     {
         if (path.Count == 0)
         {
-            //SetMovingState(false);
+            SetIdleState();
             IsMovingToAttack = false;
             return;
         }
@@ -211,7 +211,7 @@ public class ActionManager : MonoBehaviour
         }
 
         currentTargetTilePosition = CalcTilePosition(currentTargetTile);
-        SetMovingState(true);
+        SetMovingState();
         IsMovingToAttack = isMovingToAttack;
         this.path = path;
     }
@@ -258,7 +258,7 @@ public class ActionManager : MonoBehaviour
 
 
         //shows currently playing unit's ui
-        CurrentlySelectedPlayingUnit.ShowUnitUI();
+        //CurrentlySelectedPlayingUnit.ShowUnitUI();
 
         SetupCurrentlyOwningUnit(CurrentlySelectedPlayingUnit);
     }
@@ -273,7 +273,7 @@ public class ActionManager : MonoBehaviour
         
 
         //shows currently playing unit's ui
-        CurrentlySelectedPlayingUnit.ShowUnitUI();
+        //CurrentlySelectedPlayingUnit.ShowUnitUI();
 
         SetupCurrentlyOwningUnit(CurrentlySelectedPlayingUnit);
     }
@@ -289,24 +289,29 @@ public class ActionManager : MonoBehaviour
         CurrentlySelectedPlayingUnit.CurrentHexTile.OwningTile.Occupied = false;
         CurrentlySelectedPlayingUnit.CurrentHexTile.ObjectOnHex = null;
         //...setting previous destination tile to be new current for moving unit and marking it as notpassable... 
+        Debug.Log("EndCurrentPlayingUnitTurn, StartingTile: " + (BattlefieldManager.ManagerInstance.StartingTile ? BattlefieldManager.ManagerInstance.StartingTile.coordinates : "null")+"; DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
         CurrentlySelectedPlayingUnit.CurrentHexTile = BattlefieldManager.ManagerInstance.DestinationTile;
 
         CurrentlySelectedPlayingUnit.CurrentHexTile.OwningTile.Occupied = true;
         CurrentlySelectedPlayingUnit.CurrentHexTile.ObjectOnHex = CurrentlySelectedPlayingUnit;
         //...reseting starting and destination tiles in order to destroy path...
         BattlefieldManager.ManagerInstance.StartingTile = null;
+
+        Debug.Log("EndCurrentPlayingUnitTurn, should be null,  StartingTile: " + (BattlefieldManager.ManagerInstance.StartingTile ? BattlefieldManager.ManagerInstance.StartingTile.coordinates: "null"));
+
         BattlefieldManager.ManagerInstance.DestinationTile = null;
+        Debug.Log("EndCurrentPlayingUnitTurn(), should be null, DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
 
         //...this destroys path when the unit reaches destination...
         BattlefieldManager.ManagerInstance.GenerateAndShowPath();
 
-        CurrentlySelectedPlayingUnit.HideUnitUI();
+        //CurrentlySelectedPlayingUnit.HideUnitUI();
         CurrentlySelectedPlayingUnit.CurrentState = UnitState.Idle;
 
         //detarget targeted unit
         if (TargetedUnit != null)
         {
-            TargetedUnit.HideUnitUI();
+           // TargetedUnit.HideUnitUI();
             TargetedUnit = null;
         }
 
@@ -335,6 +340,9 @@ public class ActionManager : MonoBehaviour
         BattlefieldManager.ManagerInstance.ResetTilesInRange();
 
         BattlefieldManager.ManagerInstance.StartingTile = ub.CurrentHexTile;
+
+        Debug.Log("SetupCurrentlyOwningUnit(UnitBehaviour ub), StartingTile: " + (BattlefieldManager.ManagerInstance.StartingTile ? BattlefieldManager.ManagerInstance.StartingTile.coordinates : "null"));
+
         BattlefieldManager.ManagerInstance.SelectTilesInRangeSimple(ub.movementRange);
     }
 

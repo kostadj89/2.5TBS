@@ -390,12 +390,8 @@ MonoBehaviour:
   gridWidthInHexes: 10
   gridHeightInHexes: 10
   sprites:
-  - {fileID: -6483104679331078662, guid: d3680f92f1a550c4894c565f0e11028d, type: 3}
-  - {fileID: 320574055814548533, guid: d3680f92f1a550c4894c565f0e11028d, type: 3}
-  - {fileID: -992305269468740640, guid: d3680f92f1a550c4894c565f0e11028d, type: 3}
-  - {fileID: 1447916563448556896, guid: d3680f92f1a550c4894c565f0e11028d, type: 3}
-  - {fileID: 1253957872253834624, guid: d3680f92f1a550c4894c565f0e11028d, type: 3}
-  - {fileID: 7356050477940587639, guid: d3680f92f1a550c4894c565f0e11028d, type: 3}
+  - {fileID: 7758712131318366516, guid: 8bd4d1af752e5614d9b6b7f82be48875, type: 3}
+  - {fileID: 3259625596495669741, guid: 8bd4d1af752e5614d9b6b7f82be48875, type: 3}
   StartingTile: {fileID: 0}
   DestinationTile: {fileID: 0}
   UnitsToPlace:
@@ -405,8 +401,6 @@ MonoBehaviour:
     type: 3}
   InstantiatedUnits: []
   InstantiatedBattlefieldObjects: []
-  CurrentlySelectedPlayingUnit: {fileID: 0}
-  TargetedUnit: {fileID: 0}
   PathLine: {fileID: 2541797487724233691, guid: 62e1e09afd14654449fe1ec17dcf3a50,
     type: 3}
   Path: []
@@ -422,7 +416,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 109f204bbb133f84288aac19b3692190, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  owningUnit: {fileID: 0}
+  OwningUnit: {fileID: 0}
+  CurrentlySelectedPlayingUnit: {fileID: 0}
+  TargetedUnit: {fileID: 0}
 --- !u!1 &2105429702
 GameObject:
   m_ObjectHideFlags: 0

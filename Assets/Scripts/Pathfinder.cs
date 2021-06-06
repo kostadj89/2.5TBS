@@ -84,39 +84,63 @@ public static class Pathfinder
 {
     public static Path<HexTile> FindPath(HexTile start, HexTile destination)
     {
-        bool DestinationIsOcupied = destination.Occupied;
-
-        destination.Occupied = false;
-        HashSet<HexTile> closed = new HashSet<HexTile>();
-
-        PriorityQueue<double, Path<HexTile>> queue = new PriorityQueue<double,Path<HexTile>>();
-        queue.Enqueue(0, new Path<HexTile>(start));
-
-        while (!queue.IsEmpty)
+        //destination is set to start if it was not reachable originally, and if it's occupied, we return the shortest length path
+        if (destination!= start && destination.Occupied)// && destination.ReachableNeighbours.Contains())
         {
-            Path<HexTile> path = queue.Dequeue();
+            Path<HexTile> min = null,currPath;
 
-            if (closed.Contains(path.LastStep))
-                continue;
-
-            if (path.LastStep.Equals(destination))
+            //if the unit is adjecent to the enemy unit, no path
+            if (destination.AllNeighbours.Contains(start))
             {
-                destination.Occupied = DestinationIsOcupied;
-                return path;
+                min = new Path<HexTile>(start);
+            }
+            else
+            {
+                foreach (HexTile reachableNeighbour in destination.ReachableNeighbours)
+                {
+                    currPath = FindPath(start, reachableNeighbour);
+
+                    if (min == null || min.Count() >= currPath.Count())
+                    {
+                        min = currPath;
+                    }
+                }
             }
 
-            closed.Add(path.LastStep);
-
-            foreach (HexTile tile in path.LastStep.AvailableNeighbours)
-            {
-                double d = Distance(path.LastStep, tile);
-                Path<HexTile> newPath = path.AddStep(tile, d+ (tile.Hazadours ? 1.5 : 0));
-                queue.Enqueue(newPath.TotalCost + Estimate(tile,destination), newPath);
-            }
+            return min;
         }
+        else
+        {
+            HashSet<HexTile> closed = new HashSet<HexTile>();
 
-        destination.Occupied = DestinationIsOcupied;
-        return null;
+            PriorityQueue<double, Path<HexTile>> queue = new PriorityQueue<double, Path<HexTile>>();
+            queue.Enqueue(0, new Path<HexTile>(start));
+
+            while (!queue.IsEmpty)
+            {
+                Path<HexTile> path = queue.Dequeue();
+
+                if (closed.Contains(path.LastStep))
+                    continue;
+
+                if (path.LastStep.Equals(destination))
+                {
+                    return path;
+                }
+
+                closed.Add(path.LastStep);
+
+                foreach (HexTile tile in path.LastStep.ReachableNeighbours)
+                {
+                    double d = Distance(path.LastStep, tile);
+                    Path<HexTile> newPath = path.AddStep(tile, d + (tile.Hazadours ? 1.5 : 0));
+                    queue.Enqueue(newPath.TotalCost + Estimate(tile, destination), newPath);
+                }
+            }
+
+            return null;
+        }
+       
 
     }
 

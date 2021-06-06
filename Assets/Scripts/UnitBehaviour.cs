@@ -97,6 +97,7 @@ private void SetupUI()
         if (Input.GetMouseButtonUp(0) && !ActionManager.Instance.IsMoving && PlayerId != ActionManager.Instance.CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>().PlayerId)
         {
             BattlefieldManager.ManagerInstance.DestinationTile = currentHexTile;
+            Debug.Log("UnitBehaviour OnMouseOver()(), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
             ActionManager.Instance.StartUnitActionOnHex(currentHexTile);
         }
 

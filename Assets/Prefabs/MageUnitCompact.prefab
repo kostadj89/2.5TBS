@@ -574,16 +574,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 3
   rotationSpeed: 0.004
-  initiative: 2
-  movementRange: 2
+  movementRange: 3
   MaxHealth: 10
   CurrentHealth: 10
   Damage: 2
   isAlive: 1
+  Initiative: 0
   attackRange: 0
   hasAttacked: 0
   CurrentState: 0
   PlayerId: 0
+  MovementType: 0
+  AttackType: 0
 --- !u!1 &2537150503247626556
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
+using UnityEngine;
 
 public struct Point
 {
@@ -41,6 +43,11 @@ public abstract class GridObject
     public override string ToString()
     {
         return string.Format("({0}, {1})", X, Y);
+    }
+
+    public Vector2 VectorLocation()
+    {
+        return new Vector2(X, Y);
     }
 }
 

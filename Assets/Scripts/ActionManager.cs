@@ -10,19 +10,13 @@ public class ActionManager : MonoBehaviour
 
     //private CharacterController owningUnitCharacterController;
 
-    //tile and position of the tile we are moving to 
-    private Vector3 currentTargetTilePosition;
-    private HexTile currentTargetTile;
-    private List<HexTile> path;
+    
 
     //i want to have only one object of script of this type, and pass it around units, so these two fields are gonna be transform of creature whose turn is now
     private Transform owningUnitTransform;
     private Animator owningUnitAnimator;
 
-    //speed in meters per second
-    private float speed = 0.0025f;
-    //probably will ignore this
-    private float rotationSpeed = 0.004f;
+
     #endregion private fields
 
     #region public fields
@@ -36,9 +30,6 @@ public class ActionManager : MonoBehaviour
     #endregion public fields
 
     #region static fields
-
-    //distance between character and tile position when we assume we reached it and start looking for the next. Explained in detail later on
-    public static float MinNextTileDist = 0.07f;
 
     //singleton, why:/
     public static ActionManager Instance = null;
@@ -61,17 +52,7 @@ public class ActionManager : MonoBehaviour
         Instance = this;
     }
 
-    private void SetMovingState()
-    {
-        CurrentlySelectedPlayingUnit.CurrentState = UnitState.Moving;
-        owningUnitAnimator.Play("walking");
-    }
-
-    private void SetIdleState()
-    {
-        CurrentlySelectedPlayingUnit.CurrentState = UnitState.Idle;
-        owningUnitAnimator.Play("Idle");
-    }
+ 
 
     // Start is called before the first frame update
     void Start()
@@ -90,33 +71,22 @@ public class ActionManager : MonoBehaviour
         switch (CurrentlySelectedPlayingUnit.CurrentState)
         {
             case UnitState.Moving:
-                
-                //if the distance between the character and the center of the next tile is short enough
-                if ((currentTargetTilePosition - owningUnitTransform.position).sqrMagnitude < MinNextTileDist * MinNextTileDist)
-                {
-                    //if we reach the destination tile
-                    if (path.IndexOf(currentTargetTile) == 0)
-                    {
-                        if (IsMovingToAttack)
-                        {
-                            IsMovingToAttack = false;
-                            StartAttack();
-                        }
-                        else
-                        {
-                            EndCurrentPlayingUnitTurn();
-                        }
 
-                        return;
+                CurrentlySelectedPlayingUnit.MovementComponent.Move();
+                if (CurrentlySelectedPlayingUnit.MovementComponent.HasFinishedMoving)
+                {
+                    if (CurrentlySelectedPlayingUnit.MovementComponent.IsMovingToAttack)
+                    {
+                        CurrentlySelectedPlayingUnit.MovementComponent.IsMovingToAttack = false;
+                        
+                        CurrentlySelectedPlayingUnit.AttackComponent.StartAttack();
                     }
 
-                    //else current target tile becomes the next tile from the list
-                    currentTargetTile = path[path.IndexOf(currentTargetTile) - 1];
-                    currentTargetTilePosition = CalcTilePosition(currentTargetTile);
+                    CurrentlySelectedPlayingUnit.SetIdleState();
+
+                    EndCurrentPlayingUnitTurn();
                 }
 
-                //MoveTowardsPosition(currentTargetTilePosition);
-                owningUnitTransform.position = Vector3.MoveTowards(owningUnitTransform.position, currentTargetTilePosition, Time.deltaTime * speed);
                 break;
             case UnitState.Attacking:
                 break;
@@ -143,91 +113,24 @@ public class ActionManager : MonoBehaviour
             case UnitState.Moving:
                 break;
             case UnitState.Idle:
-                PrepareToStartMoving(targetHexBehaviour);
+                CurrentlySelectedPlayingUnit.MovementComponent.InitializeMoving(targetHexBehaviour);
                 break;
         }
 
     }
 
-    public Vector3 CalcTilePosition(HexTile tile)
-    {
-        Vector2 tileGridPosition = new Vector2(tile.X, tile.Y);
-        Vector3 tilePos = BattlefieldManager.ManagerInstance.GetUnitAnchorFromATileOnBoard(tileGridPosition);
-
-        return tilePos;
-    }
-
-    //have to solve moving to allied units
-    public void PrepareToStartMoving(HexBehaviour targetHexBehaviour)
-    {
-        BattlefieldManager.ManagerInstance.GenerateAndShowPath();
-
-        var path = Pathfinder.FindPath(BattlefieldManager.ManagerInstance.StartingTile.OwningTile, BattlefieldManager.ManagerInstance.DestinationTile.OwningTile);
-
-        if (BattlefieldManager.ManagerInstance.DestinationTile.OwningTile.Occupied)
-        {
-            UnitBehaviour ub = (UnitBehaviour)BattlefieldManager.ManagerInstance.DestinationTile.ObjectOnHex;
-
-            if (ub.PlayerId != CurrentlySelectedPlayingUnit.PlayerId)
-            {
-                BattlefieldManager.ManagerInstance.DestinationTile.ChangeHexVisualToOccupied();
-               TargetedUnit = ub;
-
-                //path = path.PreviousSteps;
-
-                BattlefieldManager.ManagerInstance.DestinationTile = path==null? BattlefieldManager.ManagerInstance.StartingTile : path.LastStep.GetHexBehaviour();
-                Debug.Log("PrepareToStartMoving(HexBehaviour targetHexBehaviour), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
-                //we color the selected path to real white
-                BattlefieldManager.ManagerInstance.DestinationTile.ChangeVisualToSelected();
-                StartMoving(path.ToList(), true);
-            }
-        }
-        else
-        {
-            //we color the selected path to real white
-            targetHexBehaviour.ChangeVisualToSelected();
-            StartMoving(path.ToList());
-        }
-    }
-
-    //method argument is a list of tiles we got from the path finding algorithm
-    public void StartMoving(List<HexTile> path, bool isMovingToAttack = false)
-    {
-        if (path.Count == 0)
-        {
-            SetIdleState();
-            IsMovingToAttack = false;
-            return;
-        }
-
-        //the first tile we need to reach is actually path[path.Count - 2], near the end of the list just before the one the unit is currently on, the unit is on path[path.Count - 1];
-        if (isMovingToAttack && path.Count == 1)
-        {
-            currentTargetTile = path[0];
-        }
-        else
-        {
-            currentTargetTile = path[path.Count - 2];
-        }
-
-        currentTargetTilePosition = CalcTilePosition(currentTargetTile);
-        SetMovingState();
-        IsMovingToAttack = isMovingToAttack;
-        this.path = path;
-    }
-
     //handles attack
     public void StartAttack()
     {
-        //
-        CurrentlySelectedPlayingUnit.CurrentState = UnitState.Attacking;
-        //we show targeted unit's ui, and damage it
-        TargetedUnit.TakeDamage(CurrentlySelectedPlayingUnit.Damage);
+        ////
+        //CurrentlySelectedPlayingUnit.CurrentState = UnitState.Attacking;
+        ////we show targeted unit's ui, and damage it
+        //TargetedUnit.TakeDamage(CurrentlySelectedPlayingUnit.Damage);
 
-        //damage attacking unit with relation strike damage
-        CurrentlySelectedPlayingUnit.TakeDamage((int)(TargetedUnit.Damage * 0.5));
+        ////damage attacking unit with relation strike damage
+        //CurrentlySelectedPlayingUnit.TakeDamage((int)(TargetedUnit.Damage * 0.5));
 
-        EndCurrentPlayingUnitTurn();
+        //EndCurrentPlayingUnitTurn();
     }
 
     #region turn management
@@ -326,15 +229,15 @@ public class ActionManager : MonoBehaviour
         CurrentlySelectedPlayingUnit = ub;
 
         //caching the transform for better performance
-        owningUnitTransform = OwningUnit.transform;
+        //owningUnitTransform = OwningUnit.transform;
 
         //animation setup
-        owningUnitAnimator = OwningUnit.GetComponent<Animator>();
+        //owningUnitAnimator = OwningUnit.GetComponent<Animator>();
 
         //SetMovingState(false);
 
-        speed = ub.speed;
-        rotationSpeed = ub.rotationSpeed;
+        //speed = ub.speed;
+        //rotationSpeed = ub.rotationSpeed;
 
         //ResetTilesInRange resets tiles which were in movement range of previous unit
         BattlefieldManager.ManagerInstance.ResetTilesInRange();

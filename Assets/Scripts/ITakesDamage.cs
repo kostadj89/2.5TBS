@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Scripts
 {
-    interface ITakesDamage
+    public interface ITakesDamage
     {
         void TakeDamage(int damage);
     }

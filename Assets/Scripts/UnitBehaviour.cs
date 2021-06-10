@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts;
+using Assets.Scripts.UnitComponents.Attack;
+using Assets.Scripts.UnitComponents.Movement;
 using UnityEngine;
 
 public enum UnitAction
@@ -22,22 +24,45 @@ public enum UnitState
     Flanking
 }
 
+public enum MovementType
+{
+    Walking,
+    Flying,
+    Teleporting
+}
+
+public enum AttackType
+{
+    Melee,
+    Ranged
+}
+
 public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
 {
+    #region Fields
+
+    //ui
+    private UnitUI unitUI;
+    //current hex
+    private HexBehaviour currentHexTile;
+    //animator
+    private Animator animator;
+
     //Movement, speed will probably be replaced with tilesPerTurn
     public float speed = 0.0025f;
     public float rotationSpeed = 0.004f;
-    //when does the unit takes turn
-    public int initiative;
+   
     //number of tiles unit can cover in single move action
     public int movementRange = 3;
 
-    private HexBehaviour currentHexTile;
+    
     //Attributes
     public int MaxHealth;
     public int CurrentHealth;
     public int Damage;
     public bool isAlive = true;
+    //when does the unit takes turn
+    public int Initiative;
 
     //attack
     public int attackRange = 1;
@@ -45,14 +70,20 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
     public bool hasAttacked;
 
     //actions
-    protected UnitAction[] availableActions = {UnitAction.Move, UnitAction.Wait, UnitAction.Attack };
+    protected UnitAction[] availableActions = { UnitAction.Move, UnitAction.Wait, UnitAction.Attack };
     //unitState
     public UnitState CurrentState;
 
     //player
     public int PlayerId;
 
-    private UnitUI unitUI;
+    //movement type
+    public MovementType MovementType;
+    //Attack type
+    public AttackType AttackType;
+    #endregion
+
+    #region Properties
 
     public HexBehaviour CurrentHexTile
     {
@@ -60,24 +91,92 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
         set { currentHexTile = value; }
     }
 
+    public IMovementComponent MovementComponent { get; set; }
+    public IAttackComponent AttackComponent { get; set; }
+
+    #endregion
+
+    #region Overrides
+
     // Start is called before the first frame update
     void Start()
     {
         unitUI = gameObject.GetComponentInChildren<UnitUI>();
         SetupUI();
         CurrentState = UnitState.Idle;
-    }
 
-private void SetupUI()
-    {
-        unitUI.SetUIMaxHealth(MaxHealth);
+        animator = gameObject.GetComponent<Animator>();
     }
 
     // Update is called once per frame
     void Update()
     {
-      
+
     }
+
+    #endregion
+
+    #region Methods
+
+    public void GetEnemies()
+    {
+        enemiesInRange.Clear();
+
+        foreach (UnitBehaviour unit in FindObjectsOfType<UnitBehaviour>())
+        {
+
+        }
+    }
+
+    public void SetMovingState()
+    {
+        CurrentState = UnitState.Moving;
+        animator.Play("walking");
+    }
+
+    public void SetIdleState()
+    {
+        CurrentState = UnitState.Idle;
+        animator.Play("Idle");
+    }
+
+    public void InitializeMovementComponent()
+    {
+        switch (MovementType)
+        {
+                
+            case MovementType.Flying:
+                break;
+            case MovementType.Teleporting:
+                break;
+            case MovementType.Walking:
+                MovementComponent = new GroundMovement();
+                break;
+
+        }
+
+        MovementComponent.InitializeComponent(this);
+    }
+
+    public void InitializeAttackComponent()
+    {
+        switch (AttackType)
+        {
+
+            case AttackType.Ranged:
+                break;
+            case AttackType.Melee:
+                AttackComponent = new MeleeAttack();
+                break;
+
+        }
+
+        AttackComponent.InitializeComponent(this);
+    }
+
+    #endregion
+
+    #region Events
 
     //The corresponding OnMouseOver function is called while the mouse stays over the object and OnMouseExit is called when it moves away.
     void OnMouseEnter()
@@ -104,19 +203,23 @@ private void SetupUI()
         Debug.Log(gameObject.ToString() + " MouseOver");
     }
 
-    public void GetEnemies()
-    {
-        enemiesInRange.Clear();
+    #endregion
 
-        foreach (UnitBehaviour unit in FindObjectsOfType<UnitBehaviour>())
-        {
-            
-        }
+    #region Unit UI
+
+    private void SetupUI()
+    {
+        unitUI.SetUIMaxHealth(MaxHealth);
+    }
+
+    private void UpdateHealthUI()
+    {
+        unitUI.SetUIHealth(CurrentHealth);
     }
 
     public void ShowUnitUI()
     {
-        if (unitUI==null) 
+        if (unitUI == null)
         {
             unitUI = gameObject.GetComponentInChildren<UnitUI>();
         }
@@ -135,8 +238,6 @@ private void SetupUI()
         UpdateHealthUI();
     }
 
-    private void UpdateHealthUI()
-    {
-        unitUI.SetUIHealth(CurrentHealth);
-    }
+    #endregion
+
 }

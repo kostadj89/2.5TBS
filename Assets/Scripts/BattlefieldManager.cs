@@ -145,8 +145,8 @@ public class BattlefieldManager : MonoBehaviour
         }
     }
 
-    //Called once on Start of the battle, it takes all the units instantiates them, sorts them by the initiative and places them on the battlefield
-    //Also setups the first unit, with the highest initiative, and begins it's turn
+    //Called once on Start of the battle, it takes all the units instantiates them, sorts them by the Initiative and places them on the battlefield
+    //Also setups the first unit, with the highest Initiative, and begins it's turn
     private void SetupUnits()
     {
         //instantiating and placing units
@@ -163,6 +163,9 @@ public class BattlefieldManager : MonoBehaviour
 
             UnitBehaviour ub = unitGameObject.GetComponent<UnitBehaviour>();
             SetupPlayerId(ub,i);
+
+            ub.InitializeMovementComponent(); 
+            ub.InitializeAttackComponent();
             PlaceUnitOnCoordinates(ub, placementPoint);
             //Show UI
             ub.ShowUnitUI();
@@ -172,7 +175,7 @@ public class BattlefieldManager : MonoBehaviour
 
         }
 
-        //ordering by initiative
+        //ordering by Initiative
         InstantiatedUnits.OrderByDescending(x => x.GetComponent<UnitBehaviour>());
     }
 

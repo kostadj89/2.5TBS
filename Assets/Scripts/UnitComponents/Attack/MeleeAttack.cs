@@ -10,6 +10,12 @@ namespace Assets.Scripts.UnitComponents.Attack
     {
         public UnitBehaviour ParentUnitBehaviour { get ; set; }
         public ITakesDamage TargetOfAttack { get; set; }
+        public int AttackRange {
+            get { return 1; }
+
+            set { }
+
+        }
 
         public void InitializeComponent(UnitBehaviour unitBehaviour)
         {

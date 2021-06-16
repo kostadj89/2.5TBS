@@ -193,7 +193,7 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
     //if we click on unit we get his tile as possible destination field instead
     void OnMouseOver()
     {
-        if (Input.GetMouseButtonUp(0) && !ActionManager.Instance.IsMoving && PlayerId != ActionManager.Instance.CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>().PlayerId)
+        if (Input.GetMouseButtonUp(0) && !ActionManager.Instance.IsMoving && PlayerId != ActionManager.Instance.CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>().PlayerId && currentHexTile.OwningTile.ReachableNeighbours.Count() > 0)
         {
             BattlefieldManager.ManagerInstance.DestinationTile = currentHexTile;
             Debug.Log("UnitBehaviour OnMouseOver()(), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));

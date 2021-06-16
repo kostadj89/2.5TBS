@@ -11,6 +11,7 @@ namespace Assets.Scripts.UnitComponents.Attack
     {
         UnitBehaviour ParentUnitBehaviour { get; set; }
         ITakesDamage TargetOfAttack { get; set; }
+        int AttackRange { get; set; }
 
         void StartAttack();
 

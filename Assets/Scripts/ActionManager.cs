@@ -119,19 +119,6 @@ public class ActionManager : MonoBehaviour
 
     }
 
-    //handles attack
-    public void StartAttack()
-    {
-        ////
-        //CurrentlySelectedPlayingUnit.CurrentState = UnitState.Attacking;
-        ////we show targeted unit's ui, and damage it
-        //TargetedUnit.TakeDamage(CurrentlySelectedPlayingUnit.Damage);
-
-        ////damage attacking unit with relation strike damage
-        //CurrentlySelectedPlayingUnit.TakeDamage((int)(TargetedUnit.Damage * 0.5));
-
-        //EndCurrentPlayingUnitTurn();
-    }
 
     #region turn management
 

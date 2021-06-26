@@ -114,9 +114,39 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
 
     }
 
+    public Type GetObjectType()
+    {
+        return typeof(UnitBehaviour);
+    }
+
     #endregion
 
     #region Methods
+
+    public bool HexContainsAnEnemy(HexBehaviour targetHexBehaviour)
+    {
+        if (targetHexBehaviour.ObjectOnHex!=null && targetHexBehaviour.ObjectOnHex.GetObjectType() == typeof(UnitBehaviour))
+        {
+            return this.PlayerId != ((UnitBehaviour) targetHexBehaviour.ObjectOnHex).PlayerId;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public bool HexContainsAnAlly(HexBehaviour targetHexBehaviour)
+    {
+        if (targetHexBehaviour.ObjectOnHex.GetObjectType() == typeof(UnitBehaviour))
+        {
+            return this.PlayerId == ((UnitBehaviour)targetHexBehaviour.ObjectOnHex).PlayerId;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
 
     public void GetEnemies()
     {
@@ -164,6 +194,7 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
         {
 
             case AttackType.Ranged:
+                AttackComponent = new RangedAttack();
                 break;
             case AttackType.Melee:
                 AttackComponent = new MeleeAttack();
@@ -193,11 +224,11 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
     //if we click on unit we get his tile as possible destination field instead
     void OnMouseOver()
     {
-        if (Input.GetMouseButtonUp(0) && !ActionManager.Instance.IsMoving && PlayerId != ActionManager.Instance.CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>().PlayerId && currentHexTile.OwningTile.ReachableNeighbours.Count() > 0)
+        if (Input.GetMouseButtonUp(0) && !ActionManager.Instance.IsMoving && PlayerId != ActionManager.Instance.CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>().PlayerId && CurrentHexTile.OwningTile.ReachableNeighbours.Count() > 0)
         {
-            BattlefieldManager.ManagerInstance.DestinationTile = currentHexTile;
+           //currentHexTile.ChangeDestinationToThis();
             Debug.Log("UnitBehaviour OnMouseOver()(), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
-            ActionManager.Instance.StartUnitActionOnHex(currentHexTile);
+            ActionManager.Instance.StartUnitActionOnHex(CurrentHexTile);
         }
 
         Debug.Log(gameObject.ToString() + " MouseOver");

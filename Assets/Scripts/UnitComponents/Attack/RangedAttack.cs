@@ -9,12 +9,13 @@ using Vector3 = UnityEngine.Vector3;
 
 namespace Assets.Scripts.UnitComponents.Attack
 {
-    class MeleeAttack : IAttackComponent
+    class RangedAttack : IAttackComponent
     {
-        public UnitBehaviour ParentUnitBehaviour { get ; set; }
+        public UnitBehaviour ParentUnitBehaviour { get; set; }
         public ITakesDamage TargetOfAttack { get; set; }
-        public int AttackRange {
-            get { return 1; }
+        public int AttackRange
+        {
+            get { return 4; }
 
             set { }
 
@@ -27,7 +28,7 @@ namespace Assets.Scripts.UnitComponents.Attack
 
         public List<HexBehaviour> GetAttackableTiles()
         {
-            Vector3 curentTileVector = ParentUnitBehaviour.MovementComponent.CurrentTargetTilePosition;
+            Vector3 curentTileVector = ParentUnitBehaviour.CurrentHexTile.UnitAnchorWorldPositionVector;
             return BattlefieldManager.ManagerInstance.GetTilesInRange(curentTileVector, AttackRange);
         }
 
@@ -42,7 +43,6 @@ namespace Assets.Scripts.UnitComponents.Attack
                 ((UnitBehaviour)TargetOfAttack).TakeDamage(ParentUnitBehaviour.Damage);
 
                 //damage attacking unit with relation strike damage
-                ParentUnitBehaviour.TakeDamage((int)(((UnitBehaviour)TargetOfAttack).Damage * 0.5));
 
                 TargetOfAttack = null;
 
@@ -53,19 +53,11 @@ namespace Assets.Scripts.UnitComponents.Attack
 
                 ActionManager.Instance.EndCurrentPlayingUnitTurn();
             }
-            //
-            else
-            {
-                ParentUnitBehaviour.MovementComponent.InitializeMoving(((UnitBehaviour)TargetOfAttack).CurrentHexTile);
-            }
-            
         }
 
         public bool AttackConditionFufilled(HexBehaviour targetHexBehaviour)
         {
-            //((OwningTile.Passable && OwningTile.IsInRange) || (OwningTile.Occupied && OwningTile.ReachableNeighbours.Count() > 0))
-            return ParentUnitBehaviour.HexContainsAnEnemy(targetHexBehaviour) &&
-                   targetHexBehaviour.OwningTile.ReachableNeighbours.Count() > 0;
+            return GetAttackableTiles().Contains(targetHexBehaviour) && ParentUnitBehaviour.HexContainsAnEnemy(targetHexBehaviour);
         }
     }
 }

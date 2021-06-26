@@ -44,22 +44,22 @@ namespace Assets.Scripts.UnitComponents.Movement
             //drawing path
             BattlefieldManager.ManagerInstance.GenerateAndShowPath();
 
-            var path = GetBestPath(BattlefieldManager.ManagerInstance.StartingTile.OwningTile, BattlefieldManager.ManagerInstance.DestinationTile.OwningTile);
+            var path = GetBestPath(BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.OwningTile, targetHexBehaviour.OwningTile);
 
             HasFinishedMoving = false;
 
-            if (BattlefieldManager.ManagerInstance.DestinationTile.OwningTile.Occupied)
+            if (targetHexBehaviour.OwningTile.Occupied)
             {
                 UnitBehaviour ub = (UnitBehaviour)BattlefieldManager.ManagerInstance.DestinationTile.ObjectOnHex;
 
                 if (ub.PlayerId != ParentUnitBehaviour.PlayerId)
                 {
                     BattlefieldManager.ManagerInstance.DestinationTile.ChangeHexVisualToOccupied();
-                    ParentUnitBehaviour.AttackComponent.TargetOfAttack = ub;
+                    //ParentUnitBehaviour.AttackComponent.TargetOfAttack = ub;
 
                     //path = path.PreviousSteps;
 
-                    BattlefieldManager.ManagerInstance.DestinationTile = path == null ? BattlefieldManager.ManagerInstance.StartingTile : path.LastStep.GetHexBehaviour();
+                    BattlefieldManager.ManagerInstance.DestinationTile = path == null ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile : path.LastStep.GetHexBehaviour();
                     Debug.Log("InitializeMoving(HexBehaviour targetHexBehaviour), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
                     //we color the selected path to real white
                     BattlefieldManager.ManagerInstance.DestinationTile.ChangeVisualToSelected();
@@ -107,17 +107,8 @@ namespace Assets.Scripts.UnitComponents.Movement
                 //if we reach the destination tile
                 if (path.IndexOf(CurrentTargetTile) == 0)
                 {
-                    //if (IsMovingToAttack)
-                    //{
-                    //    IsMovingToAttack = false;
-                    //    StartAttack();
-                    //}
-                    //else
-                    //{
-                    //    EndCurrentPlayingUnitTurn();
-                    //}
                     HasFinishedMoving = true;
-
+                    //BattlefieldManager.ManagerInstance.DestinationTile = CurrentTargetTile.GetHexBehaviour();
                     return;
                 }
 
@@ -138,6 +129,11 @@ namespace Assets.Scripts.UnitComponents.Movement
 
             //caching parent transform
             parentTransform = ParentUnitBehaviour.transform;
+        }
+
+        public bool MovementConditionFufilled(HexBehaviour targetHexBehaviour)
+        {
+            return targetHexBehaviour.OwningTile.Passable && targetHexBehaviour.OwningTile.IsInRange;
         }
 
         #endregion Interface

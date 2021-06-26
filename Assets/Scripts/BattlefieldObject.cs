@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,6 +29,11 @@ public class BattlefieldObject : MonoBehaviour, IIsOnHexGrid
     void Update()
     {
         
+    }
+
+    public Type GetObjectType()
+    {
+        return typeof(BattlefieldObject);
     }
 }
 

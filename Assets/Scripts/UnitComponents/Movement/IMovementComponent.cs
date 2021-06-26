@@ -17,8 +17,10 @@ namespace Assets.Scripts.UnitComponents.Movement
 
         Path<HexTile> GetBestPath(HexTile start, HexTile finish);
         void InitializeMoving(HexBehaviour targetHexBehaviour);
-        void StartMovingAlongPath(List<HexTile> path, bool isMovingToAttack = false);
+        //void StartMovingAlongPath(List<HexTile> path, bool isMovingToAttack = false);
         void Move();
         void InitializeComponent(UnitBehaviour unitBehaviour);
+
+        bool MovementConditionFufilled(HexBehaviour targetHexBehaviour);
     }
 }

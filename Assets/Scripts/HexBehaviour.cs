@@ -81,7 +81,7 @@ public class HexBehaviour : MonoBehaviour
     {
         if (!ActionManager.Instance.IsMoving)
         {
-            if ((OwningTile.IsInRange && OwningTile.Passable && this != BattlefieldManager.ManagerInstance.DestinationTile && this != BattlefieldManager.ManagerInstance.StartingTile)||(OwningTile.Occupied && OwningTile.ReachableNeighbours.Count()>0))
+            if ((OwningTile.IsInRange && OwningTile.Passable && this != BattlefieldManager.ManagerInstance.DestinationTile && this != BattlefieldManager.ManagerInstance.StartingHexBehaviorTile)||(OwningTile.Occupied && OwningTile.ReachableNeighbours.Count()>0))
             {
                 ChangeDestinationToThis();
             }
@@ -97,8 +97,8 @@ public class HexBehaviour : MonoBehaviour
 
     void OnMouseExit()
     {
-        //if (OwningTile.Passable  && this != BattlefieldManager.ManagerInstance.DestinationTile && this != BattlefieldManager.ManagerInstance.StartingTile)
-        if (OwningTile.Passable && OwningTile.IsInRange && this != BattlefieldManager.ManagerInstance.StartingTile && !ActionManager.Instance.IsMoving)
+        //if (OwningTile.Passable  && this != BattlefieldManager.ManagerInstance.DestinationTile && this != BattlefieldManager.ManagerInstance.StartingHexBehaviorTile)
+        if (OwningTile.Passable && OwningTile.IsInRange && this != BattlefieldManager.ManagerInstance.StartingHexBehaviorTile && !ActionManager.Instance.IsMoving)
         {
             if (this.OwningTile.Hazadours)
             {
@@ -113,7 +113,7 @@ public class HexBehaviour : MonoBehaviour
 
     void OnMouseOver()
     {
-        if (Input.GetMouseButtonUp(0) && !ActionManager.Instance.IsMoving && ((OwningTile.Passable && OwningTile.IsInRange) || (OwningTile.Occupied && OwningTile.ReachableNeighbours.Count() > 0)))
+        if (Input.GetMouseButtonUp(0) && (ActionManager.Instance.CurrentlySelectedPlayingUnit.CurrentState==UnitState.Idle))
         {
             ActionManager.Instance.StartUnitActionOnHex(this);
         }
@@ -130,7 +130,7 @@ public class HexBehaviour : MonoBehaviour
     //when we're over inacessable tile
     private void ChangeDestinationToStart()
     {
-        BattlefieldManager.ManagerInstance.DestinationTile = BattlefieldManager.ManagerInstance.StartingTile;
+        BattlefieldManager.ManagerInstance.DestinationTile = BattlefieldManager.ManagerInstance.StartingHexBehaviorTile;
         Debug.Log("ChangeDestinationToStart(), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
 
     }
@@ -139,14 +139,14 @@ public class HexBehaviour : MonoBehaviour
     {
         if (this == origin)
         {
-            BattlefieldManager.ManagerInstance.StartingTile = null;
-            Debug.Log("StartingTileChanged(HexBehaviour origin), should be null, StartingTile: " + (BattlefieldManager.ManagerInstance.StartingTile ? BattlefieldManager.ManagerInstance.StartingTile.coordinates : "null"));
+            BattlefieldManager.ManagerInstance.StartingHexBehaviorTile = null;
+            Debug.Log("StartingTileChanged(HexBehaviour origin), should be null, StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates : "null"));
             TileBehaviourSpriteRenderer.sprite = NormalLookingHex;
             return;
         }
 
-        BattlefieldManager.ManagerInstance.StartingTile = this;
-        Debug.Log("StartingTileChanged(HexBehaviour origin), StartingTile: " + (BattlefieldManager.ManagerInstance.StartingTile ? BattlefieldManager.ManagerInstance.StartingTile.coordinates : "null"));
+        BattlefieldManager.ManagerInstance.StartingHexBehaviorTile = this;
+        Debug.Log("StartingTileChanged(HexBehaviour origin), StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates : "null"));
         ChangeVisualToSelected();
     }
 
@@ -155,4 +155,5 @@ public class HexBehaviour : MonoBehaviour
 public interface IIsOnHexGrid
 {
     HexBehaviour CurrentHexTile { get; set; }
+    Type GetObjectType();
 }

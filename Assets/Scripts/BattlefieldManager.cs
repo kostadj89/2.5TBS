@@ -39,7 +39,7 @@ public class BattlefieldManager : MonoBehaviour
 
     //Tile and Tile behaviour
     public HexTile SelectedTile = null;
-    public HexBehaviour StartingTile = null;
+    public HexBehaviour StartingHexBehaviorTile = null;
     public HexBehaviour DestinationTile = null;
 
     //List of units to be placed on the board, not instantiated
@@ -209,15 +209,16 @@ public class BattlefieldManager : MonoBehaviour
     //select all tiles in range and marks them as in range
     internal void SelectTilesInRangeSimple(int movementRange)
     {
-        if (!Board.ContainsValue(this.StartingTile))
+        if (!Board.ContainsValue(this.StartingHexBehaviorTile))
         {
             return;
         }
 
-        Point currentUnitPoint = Board.FirstOrDefault(x => x.Value == this.StartingTile).Key;
-        List<HexBehaviour> reachableTiles = Board.Values.Where(b =>
-            Vector3.Distance(this.StartingTile.UnitAnchorWorldPositionVector, b.UnitAnchorWorldPositionVector) <=
-            movementRange * DISTANCE_BETWEEN_HEXES).ToList();
+        //Point currentUnitPoint = Board.FirstOrDefault(x => x.Value == this.StartingHexBehaviorTile).Key;
+        //List<HexBehaviour> reachableTiles = Board.Values.Where(b =>
+        //    Vector3.Distance(this.StartingHexBehaviorTile.UnitAnchorWorldPositionVector, b.UnitAnchorWorldPositionVector) <=
+        //    movementRange * DISTANCE_BETWEEN_HEXES).ToList();
+        List<HexBehaviour> reachableTiles = GetTilesInRange(this.StartingHexBehaviorTile.UnitAnchorWorldPositionVector,movementRange);
 
         foreach (HexBehaviour reachableTile in reachableTiles)
         {
@@ -228,18 +229,25 @@ public class BattlefieldManager : MonoBehaviour
                 reachableTile.ChangeVisualToReachable();
             }
 
-            //Debug.Log("Distance from (" + currentUnitPoint.X.ToString() + ", " + currentUnitPoint.Y.ToString() + ") to the (" + i + ", " + j + ") is: " + Vector3.Distance(StartingTile.UnitAnchorWorldPositionVector, reachableTile.UnitAnchorWorldPositionVector));
+            //Debug.Log("Distance from (" + currentUnitPoint.X.ToString() + ", " + currentUnitPoint.Y.ToString() + ") to the (" + i + ", " + j + ") is: " + Vector3.Distance(StartingHexBehaviorTile.UnitAnchorWorldPositionVector, reachableTile.UnitAnchorWorldPositionVector));
         }
+    }
+
+    internal List<HexBehaviour> GetTilesInRange(Vector3 startingTileVector3,int range)
+    {
+        return Board.Values.Where(b =>
+            Vector3.Distance(startingTileVector3, b.UnitAnchorWorldPositionVector) <=
+            range * DISTANCE_BETWEEN_HEXES).ToList();
     }
 
     internal void SelectTilesInRange(int movementRange)
     {
-        if (!Board.ContainsValue(this.StartingTile))
+        if (!Board.ContainsValue(this.StartingHexBehaviorTile))
         {
             return;
         }
 
-        Point currentUnitPoint = Board.FirstOrDefault(x => x.Value == this.StartingTile).Key;
+        Point currentUnitPoint = Board.FirstOrDefault(x => x.Value == this.StartingHexBehaviorTile).Key;
 
         Debug.Log("Unit's starting coordiantes: ("+ currentUnitPoint.X.ToString()+", "+ currentUnitPoint.Y.ToString()+")");
 
@@ -275,7 +283,7 @@ public class BattlefieldManager : MonoBehaviour
                             selectedTileBehaviour.OwningTile.IsInRange = true;
                             //selectedTileBehaviour.ChangeHexVisual(Color.cyan);
 
-                            Debug.Log("Distance from (" + currentUnitPoint.X.ToString() + ", " + currentUnitPoint.Y.ToString() + ") to the (" +i+", "+ j +") is: "+ Vector3.Distance(StartingTile.UnitAnchorWorldPositionVector, selectedTileBehaviour.UnitAnchorWorldPositionVector));
+                            Debug.Log("Distance from (" + currentUnitPoint.X.ToString() + ", " + currentUnitPoint.Y.ToString() + ") to the (" +i+", "+ j +") is: "+ Vector3.Distance(StartingHexBehaviorTile.UnitAnchorWorldPositionVector, selectedTileBehaviour.UnitAnchorWorldPositionVector));
                         }
                     }
                 }
@@ -285,8 +293,8 @@ public class BattlefieldManager : MonoBehaviour
 
     public void SetupStartingTile(HexBehaviour currentHexTile)
     {
-        StartingTile = currentHexTile;
-        StartingTile.ChangeVisualToSelected();
+        StartingHexBehaviorTile = currentHexTile;
+        StartingHexBehaviorTile.ChangeVisualToSelected();
     }
 
     private void PlaceUnitOnCoordinates(UnitBehaviour ub, Point placementPoint)
@@ -422,7 +430,7 @@ public class BattlefieldManager : MonoBehaviour
         foreach (HexTile tile  in pathTiles)
         {
             //didn't want to make start and destination tiles visible, but i'm not sure this is the right way to do it
-            if (tile!=StartingTile.OwningTile && tile != DestinationTile.OwningTile)
+            if (tile!=StartingHexBehaviorTile.OwningTile && tile != DestinationTile.OwningTile)
             {
                 GameObject pathLine = (GameObject)Instantiate(PathLine);
                 //calcWorldCoord method uses squiggly axis coordinates so we add y / 2 to convert x coordinate from straight axis coordinate system
@@ -441,13 +449,13 @@ public class BattlefieldManager : MonoBehaviour
     //creates and draws the path
     public void GenerateAndShowPath()
     {
-        if (StartingTile==null || (DestinationTile == null))
+        if (StartingHexBehaviorTile==null || (DestinationTile == null))
         {
             DrawPath(new List<HexTile>());
             return;
         }
 
-        var path = Pathfinder.FindPath(StartingTile.OwningTile, DestinationTile.OwningTile);
+        var path = Pathfinder.FindPath(StartingHexBehaviorTile.OwningTile, DestinationTile.OwningTile);
         DrawPath(path);
     }
 

@@ -392,13 +392,11 @@ MonoBehaviour:
   sprites:
   - {fileID: 7758712131318366516, guid: 8bd4d1af752e5614d9b6b7f82be48875, type: 3}
   - {fileID: 3259625596495669741, guid: 8bd4d1af752e5614d9b6b7f82be48875, type: 3}
-  StartingTile: {fileID: 0}
+  StartingHexBehaviorTile: {fileID: 0}
   DestinationTile: {fileID: 0}
   UnitsToPlace:
   - {fileID: 2306844897146346355, guid: 765f8126533927c4d98ec9a20bf7375c, type: 3}
-  - {fileID: 2306844897146346355, guid: 765f8126533927c4d98ec9a20bf7375c, type: 3}
-  - {fileID: 2306844897146346355, guid: 765f8126533927c4d98ec9a20bf7375c, type: 3}
-  - {fileID: 2306844897146346355, guid: 765f8126533927c4d98ec9a20bf7375c, type: 3}
+  - {fileID: 2306844897146346355, guid: e8b9f03716e673d42bb8d167354f175d, type: 3}
   BattlefieldObjectToPlace: {fileID: 1065609779880414884, guid: b8f5bf964c17dc648a36309000b0494b,
     type: 3}
   InstantiatedUnits: []

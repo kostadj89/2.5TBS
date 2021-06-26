@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts;
 using UnityEngine;
 
 public class ActionManager : MonoBehaviour
@@ -78,13 +79,37 @@ public class ActionManager : MonoBehaviour
                     if (CurrentlySelectedPlayingUnit.MovementComponent.IsMovingToAttack)
                     {
                         CurrentlySelectedPlayingUnit.MovementComponent.IsMovingToAttack = false;
-                        
-                        CurrentlySelectedPlayingUnit.AttackComponent.StartAttack();
+
+                        ITakesDamage target = CurrentlySelectedPlayingUnit.AttackComponent.TargetOfAttack;
+
+                        //...setting previously occupied tile back to being passable...
+                        CurrentlySelectedPlayingUnit.CurrentHexTile.OwningTile.Occupied = false;
+                        CurrentlySelectedPlayingUnit.CurrentHexTile.ObjectOnHex = null;
+                        //...setting previous destination tile to be new current for moving unit and marking it as notpassable... 
+                        Debug.Log("EndCurrentPlayingUnitTurn, StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates : "null") + "; DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
+                        CurrentlySelectedPlayingUnit.CurrentHexTile = BattlefieldManager.ManagerInstance.DestinationTile;
+
+                        CurrentlySelectedPlayingUnit.CurrentHexTile.OwningTile.Occupied = true;
+                        CurrentlySelectedPlayingUnit.CurrentHexTile.ObjectOnHex = CurrentlySelectedPlayingUnit;
+
+                        CurrentlySelectedPlayingUnit.AttackComponent.StartAttack(target);
                     }
+                    else
+                    {
+                        CurrentlySelectedPlayingUnit.SetIdleState();
 
-                    CurrentlySelectedPlayingUnit.SetIdleState();
+                        //...setting previously occupied tile back to being passable...
+                        CurrentlySelectedPlayingUnit.CurrentHexTile.OwningTile.Occupied = false;
+                        CurrentlySelectedPlayingUnit.CurrentHexTile.ObjectOnHex = null;
+                        //...setting previous destination tile to be new current for moving unit and marking it as notpassable... 
+                        Debug.Log("EndCurrentPlayingUnitTurn, StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates : "null") + "; DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
+                        CurrentlySelectedPlayingUnit.CurrentHexTile = BattlefieldManager.ManagerInstance.DestinationTile;
 
-                    EndCurrentPlayingUnitTurn();
+                        CurrentlySelectedPlayingUnit.CurrentHexTile.OwningTile.Occupied = true;
+                        CurrentlySelectedPlayingUnit.CurrentHexTile.ObjectOnHex = CurrentlySelectedPlayingUnit;
+
+                        EndCurrentPlayingUnitTurn();
+                    }
                 }
 
                 break;
@@ -102,21 +127,14 @@ public class ActionManager : MonoBehaviour
 
     public void StartUnitActionOnHex(HexBehaviour targetHexBehaviour)
     {
-        switch (CurrentlySelectedPlayingUnit.CurrentState)
+        if (CurrentlySelectedPlayingUnit.AttackComponent.AttackConditionFufilled(targetHexBehaviour))
         {
-            case UnitState.Attacking:
-                break;
-            case UnitState.CastingSpell:
-                break;
-            case UnitState.Flanking:
-                break;
-            case UnitState.Moving:
-                break;
-            case UnitState.Idle:
-                CurrentlySelectedPlayingUnit.MovementComponent.InitializeMoving(targetHexBehaviour);
-                break;
+            CurrentlySelectedPlayingUnit.AttackComponent.StartAttack((ITakesDamage)targetHexBehaviour.ObjectOnHex);
         }
-
+        else if (CurrentlySelectedPlayingUnit.MovementComponent.MovementConditionFufilled(targetHexBehaviour))
+        {
+            CurrentlySelectedPlayingUnit.MovementComponent.InitializeMoving(targetHexBehaviour);
+        }
     }
 
 
@@ -171,23 +189,13 @@ public class ActionManager : MonoBehaviour
     public void EndCurrentPlayingUnitTurn()
     {
         //don't know if this is necessary
-        BattlefieldManager.ManagerInstance.StartingTile.ChangeHexVisualToDeselected();
+        BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.ChangeHexVisualToDeselected();
         BattlefieldManager.ManagerInstance.DestinationTile.ChangeHexVisualToDeselected();
 
-        
-        //...setting previously occupied tile back to being passable...
-        CurrentlySelectedPlayingUnit.CurrentHexTile.OwningTile.Occupied = false;
-        CurrentlySelectedPlayingUnit.CurrentHexTile.ObjectOnHex = null;
-        //...setting previous destination tile to be new current for moving unit and marking it as notpassable... 
-        Debug.Log("EndCurrentPlayingUnitTurn, StartingTile: " + (BattlefieldManager.ManagerInstance.StartingTile ? BattlefieldManager.ManagerInstance.StartingTile.coordinates : "null")+"; DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
-        CurrentlySelectedPlayingUnit.CurrentHexTile = BattlefieldManager.ManagerInstance.DestinationTile;
-
-        CurrentlySelectedPlayingUnit.CurrentHexTile.OwningTile.Occupied = true;
-        CurrentlySelectedPlayingUnit.CurrentHexTile.ObjectOnHex = CurrentlySelectedPlayingUnit;
         //...reseting starting and destination tiles in order to destroy path...
-        BattlefieldManager.ManagerInstance.StartingTile = null;
+        BattlefieldManager.ManagerInstance.StartingHexBehaviorTile = null;
 
-        Debug.Log("EndCurrentPlayingUnitTurn, should be null,  StartingTile: " + (BattlefieldManager.ManagerInstance.StartingTile ? BattlefieldManager.ManagerInstance.StartingTile.coordinates: "null"));
+        Debug.Log("EndCurrentPlayingUnitTurn, should be null,  StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates: "null"));
 
         BattlefieldManager.ManagerInstance.DestinationTile = null;
         Debug.Log("EndCurrentPlayingUnitTurn(), should be null, DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
@@ -229,9 +237,9 @@ public class ActionManager : MonoBehaviour
         //ResetTilesInRange resets tiles which were in movement range of previous unit
         BattlefieldManager.ManagerInstance.ResetTilesInRange();
 
-        BattlefieldManager.ManagerInstance.StartingTile = ub.CurrentHexTile;
+        BattlefieldManager.ManagerInstance.StartingHexBehaviorTile = ub.CurrentHexTile;
 
-        Debug.Log("SetupCurrentlyOwningUnit(UnitBehaviour ub), StartingTile: " + (BattlefieldManager.ManagerInstance.StartingTile ? BattlefieldManager.ManagerInstance.StartingTile.coordinates : "null"));
+        Debug.Log("SetupCurrentlyOwningUnit(UnitBehaviour ub), StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates : "null"));
 
         BattlefieldManager.ManagerInstance.SelectTilesInRangeSimple(ub.movementRange);
     }

@@ -13,8 +13,12 @@ namespace Assets.Scripts.UnitComponents.Attack
         ITakesDamage TargetOfAttack { get; set; }
         int AttackRange { get; set; }
 
-        void StartAttack();
+        void StartAttack(ITakesDamage targetOfAttack);
 
         void InitializeComponent(UnitBehaviour unitBehaviour);
+
+        List<HexBehaviour> GetAttackableTiles();
+
+        bool AttackConditionFufilled(HexBehaviour targetHexBehaviour);
     }
 }

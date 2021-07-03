@@ -41,7 +41,7 @@ public class HexBehaviour : MonoBehaviour
 
     public void ChangeHexVisualToDeselected()
     {
-        ChangeHexVisual(Color.white, this.OwningTile.Hazadours ? HazardousLookingHex : NormalLookingHex);
+        ChangeHexVisual(Color.white, NormalLookingHex);
     }
 
     public void ChangeHexVisualToHazardous()
@@ -100,14 +100,7 @@ public class HexBehaviour : MonoBehaviour
         //if (OwningTile.Passable  && this != BattlefieldManager.ManagerInstance.DestinationTile && this != BattlefieldManager.ManagerInstance.StartingHexBehaviorTile)
         if (OwningTile.Passable && OwningTile.IsInRange && this != BattlefieldManager.ManagerInstance.StartingHexBehaviorTile && !ActionManager.Instance.IsMoving)
         {
-            if (this.OwningTile.Hazadours)
-            {
-                ChangeHexVisualToHazardous();
-            }
-            else
-            {
-                ChangeVisualToReachable();
-            }
+            ChangeVisualToReachable();
         }
     }
 

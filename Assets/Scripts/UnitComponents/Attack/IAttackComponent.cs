@@ -12,6 +12,7 @@ namespace Assets.Scripts.UnitComponents.Attack
         UnitBehaviour ParentUnitBehaviour { get; set; }
         ITakesDamage TargetOfAttack { get; set; }
         int AttackRange { get; set; }
+        float DamageModifier { get; set; }
 
         void StartAttack(ITakesDamage targetOfAttack);
 
@@ -20,5 +21,7 @@ namespace Assets.Scripts.UnitComponents.Attack
         List<HexBehaviour> GetAttackableTiles();
 
         bool AttackConditionFufilled(HexBehaviour targetHexBehaviour);
+
+        float CalculateDamageModifiers();
     }
 }

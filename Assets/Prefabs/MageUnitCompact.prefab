@@ -575,9 +575,9 @@ MonoBehaviour:
   speed: 3
   rotationSpeed: 0.004
   movementRange: 3
-  MaxHealth: 10
-  CurrentHealth: 10
-  Damage: 2
+  MaxHealth: 15
+  CurrentHealth: 15
+  Damage: 4
   isAlive: 1
   Initiative: 0
   attackRange: 0

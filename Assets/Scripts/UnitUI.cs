@@ -29,10 +29,14 @@ public class UnitUI : MonoBehaviour
         HealthBar.transform.position = Camera.main.WorldToScreenPoint(this.transform.position);
     }
 
-    public void EnableUnitUI()
+    public void EnableUnitUI(int playerID)
     {
         healthPointsText.enabled = true;
         HealthBar.SetActive(true);
+
+        Transform fillObject = HealthBar.transform.GetChild(0);
+        Image image = fillObject.GetComponent<Image>();
+        image.color = playerID == 1 ? Color.red : Color.blue;
     }
 
     public void DisableUnitUI()

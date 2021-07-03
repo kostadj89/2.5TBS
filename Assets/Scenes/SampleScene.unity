@@ -20,10 +20,10 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.212, g: 0.227, b: 0.259, a: 1}
+  m_AmbientSkyColor: {r: 0.22837424, g: 0.41509432, b: 0.064613745, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
-  m_AmbientIntensity: 1
+  m_AmbientIntensity: 0
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
@@ -35,10 +35,10 @@ RenderSettings:
   m_DefaultReflectionMode: 0
   m_DefaultReflectionResolution: 128
   m_ReflectionBounces: 1
-  m_ReflectionIntensity: 1
+  m_ReflectionIntensity: 0
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
+  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 0}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -51,7 +51,7 @@ LightmapSettings:
     m_IndirectOutputScale: 1
     m_AlbedoBoost: 1
     m_EnvironmentLightingMode: 0
-    m_EnableBakedLightmaps: 1
+    m_EnableBakedLightmaps: 0
     m_EnableRealtimeLightmaps: 0
   m_LightmapEditorSettings:
     serializedVersion: 12
@@ -97,7 +97,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: f014ecdf38c90454eb97bc0a452a3878,
+    type: 2}
   m_UseShadowmask: 1
 --- !u!196 &4
 NavMeshSettings:
@@ -397,6 +398,10 @@ MonoBehaviour:
   UnitsToPlace:
   - {fileID: 2306844897146346355, guid: 765f8126533927c4d98ec9a20bf7375c, type: 3}
   - {fileID: 2306844897146346355, guid: e8b9f03716e673d42bb8d167354f175d, type: 3}
+  - {fileID: 2306844897146346355, guid: 765f8126533927c4d98ec9a20bf7375c, type: 3}
+  - {fileID: 2306844897146346355, guid: 765f8126533927c4d98ec9a20bf7375c, type: 3}
+  - {fileID: 2306844897146346355, guid: e8b9f03716e673d42bb8d167354f175d, type: 3}
+  - {fileID: 2306844897146346355, guid: e8b9f03716e673d42bb8d167354f175d, type: 3}
   BattlefieldObjectToPlace: {fileID: 1065609779880414884, guid: b8f5bf964c17dc648a36309000b0494b,
     type: 3}
   InstantiatedUnits: []
@@ -404,6 +409,7 @@ MonoBehaviour:
   PathLine: {fileID: 2541797487724233691, guid: 62e1e09afd14654449fe1ec17dcf3a50,
     type: 3}
   Path: []
+  CombatStarted: 0
 --- !u!114 &963194230
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -464,13 +470,13 @@ MeshRenderer:
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 0
   m_RayTracingMode: 2
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 2bfca19293d33dc488073cccac895b3b, type: 2}
+  - {fileID: 2100000, guid: 6c98d1781114efa42bd7ea7e40e175ad, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

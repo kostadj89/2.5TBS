@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using System.Security.Cryptography.X509Certificates;
 using UnityEngine;
+using UnityEngine.Scripting;
 using Random = UnityEngine.Random;
 
 public class BattlefieldManager : MonoBehaviour
@@ -62,6 +63,9 @@ public class BattlefieldManager : MonoBehaviour
     //Board
     private Dictionary<Point, HexBehaviour> Board;
 
+    //Combat has begun
+    public bool CombatStarted = false;
+
 
     #endregion Props
 
@@ -80,68 +84,77 @@ public class BattlefieldManager : MonoBehaviour
         SetHexSize();
         CalculateInitialPosition();
         CreateGrid();
-        SetupBattlefieldObjects();
+        SetupSpecialHexes();
         SetupUnits();
        // SetHazadoursTiles();
        
         //setup first playing unit
+        CombatStarted = true;
         ActionManager.Instance.StartCurrentlyPlayingUnitTurn(InstantiatedUnits[0].GetComponent<UnitBehaviour>());
     }
 
-    private void SetHazadoursTiles()
-    {
-        int intRandom = Random.Range(25, 30);
-        int rX, rY;
-        Point p;
-        HexBehaviour hb;
+    //private void SetHazadoursTiles()
+    //{
+    //    int intRandom = Random.Range(25, 30);
+    //    int rX, rY;
+    //    Point p;
+    //    HexBehaviour hb;
         
-        int i = 0;
-        while( i < intRandom)
-        {
-            rX = Random.Range(1, 8);
-            rY = Random.Range(1, 8);
+    //    int i = 0;
+    //    while( i < intRandom)
+    //    {
+    //        rX = Random.Range(1, 8);
+    //        rY = Random.Range(1, 8);
 
-            p = new Point(rX, rY);
+    //        p = new Point(rX, rY);
 
-            if (Board.ContainsKey(p))
-            {
-                hb = Board[p];
+    //        if (Board.ContainsKey(p))
+    //        {
+    //            hb = Board[p];
 
-                if (hb.OwningTile.Passable && !hb.OwningTile.Occupied)
-                {
-                    hb.OwningTile.Hazadours = true;
-                    hb.ChangeHexVisualToHazardous();
-                    i++;
-                }
-            }
-        }
-    }
+    //            if (hb.OwningTile.Passable && !hb.OwningTile.Occupied)
+    //            {
+    //                hb.OwningTile.Hazadours = true;
+    //                hb.ChangeHexVisualToHazardous();
+    //                i++;
+    //            }
+    //        }
+    //    }
+    //}
 
-    private void SetupBattlefieldObjects()
+    private void SetupSpecialHexes()
     {
-        int intRandom = Random.Range(5, 10);
+        int intRandom = Random.Range(10, 20);
         int rX, rY;
         Point p;
 
         InstantiatedBattlefieldObjects = new List<GameObject>();
 
         GameObject currentBattlefieldObject;
-        BattlefieldObject battlefieldObject;
+        BattlefieldSpecialHex battlefieldSpecialHex;
 
-        for (int i = 0; i < intRandom; i++)
+        for (int i = 0; i < intRandom;)
         {
-           rX = Random.Range(0, 5);
-           rY = Random.Range(0, 5);
+           rX = Random.Range(0, 10);
+           rY = Random.Range(0 - rX/2, 10 - rX / 2);
  
            p = new Point(rX, rY);
 
-           currentBattlefieldObject =
-               Instantiate(BattlefieldObjectToPlace, Board[p].transform.position, Quaternion.identity);
+           if (Board.ContainsKey(p) && Board[p].ObjectOnHex == null)
+           {
+               currentBattlefieldObject =
+                   Instantiate(BattlefieldObjectToPlace, Board[p].transform.position, Quaternion.identity);
 
-           battlefieldObject = currentBattlefieldObject.GetComponent<BattlefieldObject>();
-           battlefieldObject.CurrentHexTile = Board[p];
-           Board[p].OwningTile.Passable = false;
-           InstantiatedBattlefieldObjects.Add(currentBattlefieldObject);
+               battlefieldSpecialHex = currentBattlefieldObject.GetComponent<BattlefieldSpecialHex>();
+            
+               //instantiate special hex
+               battlefieldSpecialHex.InstatiateSpecialHex(Board[p]);
+
+               //add to the list of Objects
+               InstantiatedBattlefieldObjects.Add(currentBattlefieldObject);
+
+               i++;
+           }
         }
     }
 
@@ -150,29 +163,41 @@ public class BattlefieldManager : MonoBehaviour
     private void SetupUnits()
     {
         //instantiating and placing units
-        int k = 0;
+        int k = 0,j=0;
         InstantiatedUnits = new List<GameObject>();
 
-        for (int i = 0; i < UnitsToPlace.Length; i++)
+        for (int i = 0; i < UnitsToPlace.Length;)
         {
-            GameObject unitGameObject = (GameObject)Instantiate(UnitsToPlace[i]);
             //Point placementPoint = new Point(-k, i);
-            Point placementPoint = i==0?new Point(2,5) : new Point(-k, i);
+            Point placementPoint = j % 2 == 0? new Point(9-k,j) : new Point(-k, j);
 
-            if (i % 2 == 1) k++;
+            if (Board.ContainsKey(placementPoint) && Board[placementPoint].ObjectOnHex == null)
+            {
+                GameObject unitGameObject = (GameObject)Instantiate(UnitsToPlace[i]);
 
-            UnitBehaviour ub = unitGameObject.GetComponent<UnitBehaviour>();
-            SetupPlayerId(ub,i);
+                if (i % 2 == 1) k++;
 
-            ub.InitializeMovementComponent(); 
-            ub.InitializeAttackComponent();
-            PlaceUnitOnCoordinates(ub, placementPoint);
-            //Show UI
-            ub.ShowUnitUI();
+                UnitBehaviour ub = unitGameObject.GetComponent<UnitBehaviour>();
+                SetupPlayerId(ub, i);
 
-            //add to instantiated list
-            InstantiatedUnits.Add(unitGameObject);
+                ub.InitializeMovementComponent();
+                ub.InitializeAttackComponent();
+                PlaceUnitOnCoordinates(ub, placementPoint);
+                //Show UI
+                ub.ShowUnitUI();
 
+                //add to instantiated list
+                InstantiatedUnits.Add(unitGameObject);
+
+                i++;
+            }
+
+            if (j>9)
+            {
+                j = 0;
+            }
+
+            j++;
         }
 
         //ordering by Initiative
@@ -238,57 +263,6 @@ public class BattlefieldManager : MonoBehaviour
         return Board.Values.Where(b =>
             Vector3.Distance(startingTileVector3, b.UnitAnchorWorldPositionVector) <=
             range * DISTANCE_BETWEEN_HEXES).ToList();
-    }
-
-    internal void SelectTilesInRange(int movementRange)
-    {
-        if (!Board.ContainsValue(this.StartingHexBehaviorTile))
-        {
-            return;
-        }
-
-        Point currentUnitPoint = Board.FirstOrDefault(x => x.Value == this.StartingHexBehaviorTile).Key;
-
-        Debug.Log("Unit's starting coordiantes: ("+ currentUnitPoint.X.ToString()+", "+ currentUnitPoint.Y.ToString()+")");
-
-        
-        //int LowerXLimit = -1 * currentUnitPoint.Y / 2;
-        //int UpperXLimit = 
-        //int lowerX = 
-        //for (int i = currentUnitPoint.X - movementRange; i < currentUnitPoint.X + movementRange+1; i++)
-        //{
-
-        //}
-
-        HexBehaviour selectedTileBehaviour = null;
-
-        //i is row index, j is column index 
-        for (int i = currentUnitPoint.X-movementRange; i < currentUnitPoint.X+movementRange+1; i++)
-        {
-            for (int j = currentUnitPoint.Y - movementRange; j < currentUnitPoint.Y + movementRange + 1; j++)
-            {
-                // range of x changes depending on Y:
-                // for Y = 0,1 => 0<=X<=9 range
-                // for Y = 8,9 => -4<=X<=5 range
-                // upper left tile coordiantes are always 0,0
-                if (j >= 0 && j < gridWidthInHexes && i >=(-1* j/2) && i < (gridHeightInHexes - j / 2))
-                {
-                    //my random formula for getting hex shaped selection
-                    if (currentUnitPoint.X + currentUnitPoint.Y - movementRange <= i + j && i + j <= currentUnitPoint.X + currentUnitPoint.Y + movementRange)
-                    {
-                        selectedTileBehaviour = Board[new Point(i, j)];
-                        
-                        if (selectedTileBehaviour.OwningTile.Passable)
-                        {
-                            selectedTileBehaviour.OwningTile.IsInRange = true;
-                            //selectedTileBehaviour.ChangeHexVisual(Color.cyan);
-
-                            Debug.Log("Distance from (" + currentUnitPoint.X.ToString() + ", " + currentUnitPoint.Y.ToString() + ") to the (" +i+", "+ j +") is: "+ Vector3.Distance(StartingHexBehaviorTile.UnitAnchorWorldPositionVector, selectedTileBehaviour.UnitAnchorWorldPositionVector));
-                        }
-                    }
-                }
-            }
-        }
     }
 
     public void SetupStartingTile(HexBehaviour currentHexTile)

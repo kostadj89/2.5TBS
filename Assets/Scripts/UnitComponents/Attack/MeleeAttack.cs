@@ -20,6 +20,8 @@ namespace Assets.Scripts.UnitComponents.Attack
 
         }
 
+        public float DamageModifier { get; set; }
+
         public void InitializeComponent(UnitBehaviour unitBehaviour)
         {
             ParentUnitBehaviour = unitBehaviour;
@@ -66,6 +68,11 @@ namespace Assets.Scripts.UnitComponents.Attack
             //((OwningTile.Passable && OwningTile.IsInRange) || (OwningTile.Occupied && OwningTile.ReachableNeighbours.Count() > 0))
             return ParentUnitBehaviour.HexContainsAnEnemy(targetHexBehaviour) &&
                    targetHexBehaviour.OwningTile.ReachableNeighbours.Count() > 0;
+        }
+
+        public float CalculateDamageModifiers()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -33,7 +33,8 @@ public class Path<Node> : IEnumerable<Node>
     {
         for (var p = this; p != null; p = p.PreviousSteps)
         {
-            yield return p.LastStep;
+           yield return p.LastStep;
+           
         }
     }
 

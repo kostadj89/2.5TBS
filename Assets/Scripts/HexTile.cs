@@ -11,6 +11,8 @@ public class HexTile : GridObject, IHasNeighbours<HexTile>
     public bool IsInRange;
     public bool Occupied;
     public bool Hazadours;
+    public bool Cover;
+    public bool HighGround;
 
     public HexTile(int x, int y)
         :base(x, y)
@@ -18,6 +20,9 @@ public class HexTile : GridObject, IHasNeighbours<HexTile>
         Passable = true;
         Occupied = false;
         Hazadours = false;
+        Cover = false;
+        HighGround = false;
+
     }
 
     public static List<Point> NeighbourShift
@@ -70,5 +75,33 @@ public class HexTile : GridObject, IHasNeighbours<HexTile>
     {
         Point p = new Point(this.X, this.Y);
         return BattlefieldManager.ManagerInstance.GeTileBehaviourFromPoint(p);
+    }
+
+    public bool HexTileBetweenTiles(HexTile t1, HexTile t2)
+    {
+        int minX, maxX, minY, maxY, sumT1,sumT2, tempSum;
+
+        minX = t1.X <= t2.X ? t1.X : t2.X;
+        maxX = t1.X <= t2.X ? t2.X : t1.X;
+
+        minY = t1.Y <= t2.Y ? t1.Y : t2.Y;
+        maxY = t1.Y <= t2.Y ? t2.Y : t1.Y;
+
+        sumT1 = t1.X + t1.Y;
+        sumT2 = t2.X + t2.Y;
+
+        if (sumT1>=sumT2)
+        {
+            tempSum = sumT1;
+            sumT1 = sumT2;
+            sumT2 = tempSum;
+        }
+
+        if ((this.X>= minX) && (this.X <= maxX) && (this.Y>=minY) && (this.Y<=maxY) && (sumT1<= X + Y) && (sumT2>= X+Y))
+        {
+            return true;
+        }
+
+        return false;
     }
 }

@@ -255,7 +255,7 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
             unitUI = gameObject.GetComponentInChildren<UnitUI>();
         }
 
-        unitUI.EnableUnitUI();
+        unitUI.EnableUnitUI(PlayerId);
     }
 
     public void HideUnitUI()
@@ -266,7 +266,20 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
     public void TakeDamage(int damage)
     {
         CurrentHealth -= damage;
-        UpdateHealthUI();
+        if (CurrentHealth <= 0)
+        {
+            isAlive = false;
+
+            if (BattlefieldManager.ManagerInstance.InstantiatedUnits.Contains(this.gameObject))
+            {
+                BattlefieldManager.ManagerInstance.InstantiatedUnits.Remove(this.gameObject);
+            }
+            Destroy(this.gameObject);
+        }
+        else
+        {
+            UpdateHealthUI();
+        }
     }
 
     #endregion

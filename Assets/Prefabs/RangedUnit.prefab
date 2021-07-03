@@ -242,7 +242,7 @@ SpriteRenderer:
   m_SortingOrder: 1
   m_Sprite: {fileID: -6028970204813815597, guid: 423c9c34d0c1aa1469b93a2bc7c868a1,
     type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.8962264, g: 0.8962264, b: 0.8962264, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -572,12 +572,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86e0fc3b7b8830441923a7138bc8438a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 3
+  speed: 2
   rotationSpeed: 0.004
-  movementRange: 3
+  movementRange: 2
   MaxHealth: 10
   CurrentHealth: 10
-  Damage: 2
+  Damage: 3
   isAlive: 1
   Initiative: 0
   attackRange: 0

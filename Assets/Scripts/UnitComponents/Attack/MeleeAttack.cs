@@ -27,16 +27,40 @@ namespace Assets.Scripts.UnitComponents.Attack
             ParentUnitBehaviour = unitBehaviour;
         }
 
+        public List<HexBehaviour> GetAttackableTilesInMeleeRange()
+        {
+            Vector3 curentTileVector = ParentUnitBehaviour.CurrentHexTile.UnitAnchorWorldPositionVector;
+            return BattlefieldManager.ManagerInstance.GetTilesInRange(curentTileVector, AttackRange);
+        }
+
         public List<HexBehaviour> GetAttackableTiles()
         {
-            Vector3 curentTileVector = ParentUnitBehaviour.MovementComponent.CurrentTargetTilePosition;
-            return BattlefieldManager.ManagerInstance.GetTilesInRange(curentTileVector, AttackRange);
+            Vector3 curentTileVector = ParentUnitBehaviour.CurrentHexTile.UnitAnchorWorldPositionVector;
+
+            List<HexBehaviour> reachableHexBehaviours = BattlefieldManager.ManagerInstance.GetTilesInRange(curentTileVector, ParentUnitBehaviour.movementRange);
+            List<HexBehaviour> attackableHexBehaviours = new List<HexBehaviour>(reachableHexBehaviours);
+
+            foreach (HexBehaviour hex in reachableHexBehaviours)
+            {
+                if (Vector3.Distance(curentTileVector,hex.UnitAnchorWorldPositionVector) == ParentUnitBehaviour.movementRange*BattlefieldManager.DISTANCE_BETWEEN_HEXES)
+                {
+                    foreach (HexTile hexTile in hex.OwningTile.AllNeighbours)
+                    {
+                        if (hexTile.Occupied)
+                        {
+                            attackableHexBehaviours.Add(hex);
+                        }
+                    }
+                }
+            }
+
+            return attackableHexBehaviours;
         }
 
         public void StartAttack(ITakesDamage target)
         {
             TargetOfAttack = target;
-            List<HexBehaviour> attackableTiles = GetAttackableTiles();
+            List<HexBehaviour> attackableTiles = GetAttackableTilesInMeleeRange();
             if (attackableTiles.Contains(((UnitBehaviour)TargetOfAttack).CurrentHexTile))
             {
                 ParentUnitBehaviour.CurrentState = UnitState.Attacking;
@@ -71,6 +95,11 @@ namespace Assets.Scripts.UnitComponents.Attack
         }
 
         public float CalculateDamageModifiers()
+        {
+            throw new NotImplementedException();
+        }
+
+        public List<HexBehaviour> GetHexesInRangeOccupiedByEnemy()
         {
             throw new NotImplementedException();
         }

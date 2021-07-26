@@ -60,7 +60,7 @@ namespace Assets.Scripts.UnitComponents.Movement
                     //path = path.PreviousSteps;
 
                     BattlefieldManager.ManagerInstance.DestinationTile = path == null ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile : path.LastStep.GetHexBehaviour();
-                    Debug.Log("InitializeMoving(HexBehaviour targetHexBehaviour), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
+                   //Debug.log("InitializeMoving(HexBehaviour targetHexBehaviour), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
                     //we color the selected path to real white
                     BattlefieldManager.ManagerInstance.DestinationTile.ChangeVisualToSelected();
                     StartMovingAlongPath(path.ToList(), true);

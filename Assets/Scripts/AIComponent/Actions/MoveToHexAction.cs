@@ -1,0 +1,40 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using UnityEngine;
+
+namespace Assets.Scripts.AIComponent
+{
+    internal class MoveToHexAction : IAction
+    {
+        private HexBehaviour chosenTargetHex;
+
+        public HexBehaviour ChosenTargetHex
+        {
+            get { return chosenTargetHex; }
+            set { chosenTargetHex = value; }
+        }
+        
+        public List<Consideration> Considerations { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public ActionType ActionType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public MoveToHexAction(HexBehaviour hexBehaviour)
+        {
+            ChosenTargetHex = hexBehaviour;
+        }
+
+        public void DoAction()
+        {
+            Debug.Log(string.Format("Enemy {0}, moves to hex with coordinates {1}", (AIAgent.AIAgentInstanceAgent.CurrentlyControledUnit).ToString(), (chosenTargetHex.OwningTile).ToString()));
+            BattlefieldManager.ManagerInstance.DestinationTile = ChosenTargetHex;
+            ActionManager.Instance.StartUnitActionOnHex(ChosenTargetHex);
+        }
+        
+        public float GetScore()
+        {
+            return 0.5f;
+        }
+    }
+}

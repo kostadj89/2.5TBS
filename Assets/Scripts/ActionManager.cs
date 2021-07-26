@@ -83,7 +83,7 @@ public class ActionManager : MonoBehaviour
                             CurrentlySelectedPlayingUnit.CurrentHexTile.OwningTile.Occupied = false;
                             CurrentlySelectedPlayingUnit.CurrentHexTile.ObjectOnHex = null;
                             //...setting previous destination tile to be new current for moving unit and marking it as notpassable... 
-                            Debug.Log("EndCurrentPlayingUnitTurn, StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates : "null") + "; DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
+                           //Debug.log("EndCurrentPlayingUnitTurn, StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates : "null") + "; DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
                             CurrentlySelectedPlayingUnit.CurrentHexTile = BattlefieldManager.ManagerInstance.DestinationTile;
 
                             CurrentlySelectedPlayingUnit.CurrentHexTile.OwningTile.Occupied = true;
@@ -99,7 +99,7 @@ public class ActionManager : MonoBehaviour
                             CurrentlySelectedPlayingUnit.CurrentHexTile.OwningTile.Occupied = false;
                             CurrentlySelectedPlayingUnit.CurrentHexTile.ObjectOnHex = null;
                             //...setting previous destination tile to be new current for moving unit and marking it as notpassable... 
-                            Debug.Log("EndCurrentPlayingUnitTurn, StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates : "null") + "; DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
+                           //Debug.log("EndCurrentPlayingUnitTurn, StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates : "null") + "; DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
                             CurrentlySelectedPlayingUnit.CurrentHexTile = BattlefieldManager.ManagerInstance.DestinationTile;
 
                             CurrentlySelectedPlayingUnit.CurrentHexTile.OwningTile.Occupied = true;
@@ -196,10 +196,10 @@ public class ActionManager : MonoBehaviour
         //...reseting starting and destination tiles in order to destroy path...
         BattlefieldManager.ManagerInstance.StartingHexBehaviorTile = null;
 
-        Debug.Log("EndCurrentPlayingUnitTurn, should be null,  StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates: "null"));
+       //Debug.log("EndCurrentPlayingUnitTurn, should be null,  StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates: "null"));
 
         BattlefieldManager.ManagerInstance.DestinationTile = null;
-        Debug.Log("EndCurrentPlayingUnitTurn(), should be null, DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
+       //Debug.log("EndCurrentPlayingUnitTurn(), should be null, DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
 
         //...this destroys path when the unit reaches destination...
         BattlefieldManager.ManagerInstance.GenerateAndShowPath();
@@ -240,9 +240,15 @@ public class ActionManager : MonoBehaviour
 
         BattlefieldManager.ManagerInstance.StartingHexBehaviorTile = ub.CurrentHexTile;
 
-        Debug.Log("SetupCurrentlyOwningUnit(UnitBehaviour ub), StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates : "null"));
+       //Debug.log("SetupCurrentlyOwningUnit(UnitBehaviour ub), StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates : "null"));
 
         BattlefieldManager.ManagerInstance.SelectTilesInRangeSimple(ub.movementRange);
+
+        if (CurrentlySelectedPlayingUnit.PlayerId == 1)
+        {
+            AIAgent.AIAgentInstanceAgent.CurrentlyControledUnit = CurrentlySelectedPlayingUnit;
+            AIAgent.AIAgentInstanceAgent.ChooseAction();
+        }
     }
 
     #endregion turn management

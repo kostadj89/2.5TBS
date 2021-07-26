@@ -32,7 +32,7 @@ namespace Assets.Scripts.UnitComponents.Attack
         public List<HexBehaviour> GetAttackableTiles()
         {
             Vector3 curentTileVector = ParentUnitBehaviour.CurrentHexTile.UnitAnchorWorldPositionVector;
-            int currAttackRange = AttackRange;
+            int currAttackRange = CalculateAttackRange();
             IsEngagedInMelee = false;
 
             foreach (HexTile tile in ParentUnitBehaviour.CurrentHexTile.OwningTile.AllNeighbours)
@@ -41,12 +41,23 @@ namespace Assets.Scripts.UnitComponents.Attack
                 {
                     currAttackRange = 1;
                     IsEngagedInMelee = true;
-                    Debug.Log("Enemy nearby, unit is engaged in melee and will now suffer retaliation strike!");
+                   //Debug.log("Enemy nearby, unit is engaged in melee and will now suffer retaliation strike!");
                     break;
                 }
             }
 
             return BattlefieldManager.ManagerInstance.GetTilesInRange(curentTileVector, currAttackRange);
+        }
+
+        private int CalculateAttackRange()
+        {
+            int currAttackRange = AttackRange;
+            if (ParentUnitBehaviour.CurrentHexTile.OwningTile.HighGround)
+            {
+                currAttackRange += 1;
+            }
+
+            return currAttackRange;
         }
 
         public void StartAttack(ITakesDamage target)
@@ -56,9 +67,10 @@ namespace Assets.Scripts.UnitComponents.Attack
             if (attackableTiles.Contains(((UnitBehaviour)TargetOfAttack).CurrentHexTile))
             {
                 ParentUnitBehaviour.CurrentState = UnitState.Attacking;
+                int calculatedDamage = (int)(CalculateDamageBonuses() * CalculateDamageModifiers());
                 //we show targeted unit's ui, and damage it
-                ((UnitBehaviour)TargetOfAttack).TakeDamage((int)(ParentUnitBehaviour.Damage * CalculateDamageModifiers()));
-
+                ((UnitBehaviour)TargetOfAttack).TakeDamage(calculatedDamage);
+                Debug.Log(string.Format("Enemy {0}, takes {1}", ((UnitBehaviour)TargetOfAttack).ToString(), calculatedDamage));
                 //damage attacking unit with relation strike damage
                 if (IsEngagedInMelee)
                 {
@@ -81,6 +93,7 @@ namespace Assets.Scripts.UnitComponents.Attack
             return GetAttackableTiles().Contains(targetHexBehaviour) && ParentUnitBehaviour.HexContainsAnEnemy(targetHexBehaviour);
         }
 
+        //returns factor for multiplication
         public float CalculateDamageModifiers()
         {
             float tempAttackModifier = 1;
@@ -104,6 +117,19 @@ namespace Assets.Scripts.UnitComponents.Attack
             return tempAttackModifier;
         }
 
+        //adds or substracks and damage int
+        public int CalculateDamageBonuses()
+        {
+            int parentBaseDamage = ParentUnitBehaviour.Damage;
+
+            if (ParentUnitBehaviour.CurrentHexTile.OwningTile.HighGround)
+            {
+                parentBaseDamage += 3;
+            }
+
+            return parentBaseDamage;
+        }
+
         //private float GetCoverModifier(Vector3 target, Vector3 rangedAttacker, List<HexTile> coversTiles)
         //{
         //    RaycastHit hit;
@@ -112,7 +138,7 @@ namespace Assets.Scripts.UnitComponents.Attack
 
         //    if (Physics.Raycast(target, direction, out hit))
         //    {
-        //        Debug.Log("ray just hit the gameobject: " + hit.collider.gameObject.name);
+        //       //Debug.log("ray just hit the gameobject: " + hit.collider.gameObject.name);
         //        HexBehaviour hitTileHexBehaviour = hit.collider.gameObject.GetComponent<HexBehaviour>();
         //        HexTile hitTile = hitTileHexBehaviour.OwningTile;
 
@@ -161,6 +187,11 @@ namespace Assets.Scripts.UnitComponents.Attack
 
 
             return bestCover;
+        }
+
+        public List<HexBehaviour> GetHexesInRangeOccupiedByEnemy()
+        {
+            throw new NotImplementedException();
         }
     }
 }

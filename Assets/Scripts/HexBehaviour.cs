@@ -116,7 +116,7 @@ public class HexBehaviour : MonoBehaviour
     {
         // we change the actual destination tile to the current one
         BattlefieldManager.ManagerInstance.DestinationTile = this;
-        Debug.Log("ChangeDestinationToThis(), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
+       //Debug.log("ChangeDestinationToThis(), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
         ChangeHexVisual(MouseOverColor, SelectedLookingHex);
     }
 
@@ -124,7 +124,7 @@ public class HexBehaviour : MonoBehaviour
     private void ChangeDestinationToStart()
     {
         BattlefieldManager.ManagerInstance.DestinationTile = BattlefieldManager.ManagerInstance.StartingHexBehaviorTile;
-        Debug.Log("ChangeDestinationToStart(), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
+       //Debug.log("ChangeDestinationToStart(), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
 
     }
 
@@ -133,13 +133,13 @@ public class HexBehaviour : MonoBehaviour
         if (this == origin)
         {
             BattlefieldManager.ManagerInstance.StartingHexBehaviorTile = null;
-            Debug.Log("StartingTileChanged(HexBehaviour origin), should be null, StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates : "null"));
+           //Debug.log("StartingTileChanged(HexBehaviour origin), should be null, StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates : "null"));
             TileBehaviourSpriteRenderer.sprite = NormalLookingHex;
             return;
         }
 
         BattlefieldManager.ManagerInstance.StartingHexBehaviorTile = this;
-        Debug.Log("StartingTileChanged(HexBehaviour origin), StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates : "null"));
+       //Debug.log("StartingTileChanged(HexBehaviour origin), StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates : "null"));
         ChangeVisualToSelected();
     }
 

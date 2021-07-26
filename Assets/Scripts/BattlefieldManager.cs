@@ -12,7 +12,7 @@ public class BattlefieldManager : MonoBehaviour
 {
     #region Consts
 
-    private const float DISTANCE_BETWEEN_HEXES = 1.58f;
+    public const float DISTANCE_BETWEEN_HEXES = 1.58f;
 
     #endregion Consts
 
@@ -86,11 +86,17 @@ public class BattlefieldManager : MonoBehaviour
         CreateGrid();
         SetupSpecialHexes();
         SetupUnits();
+        CreateAIAgent();
        // SetHazadoursTiles();
        
         //setup first playing unit
         CombatStarted = true;
         ActionManager.Instance.StartCurrentlyPlayingUnitTurn(InstantiatedUnits[0].GetComponent<UnitBehaviour>());
+    }
+
+    private void CreateAIAgent()
+    {
+        AIAgent aiAgent = new AIAgent();
     }
 
     //private void SetHazadoursTiles()
@@ -99,7 +105,7 @@ public class BattlefieldManager : MonoBehaviour
     //    int rX, rY;
     //    Point p;
     //    HexBehaviour hb;
-        
+
     //    int i = 0;
     //    while( i < intRandom)
     //    {
@@ -214,8 +220,27 @@ public class BattlefieldManager : MonoBehaviour
         return Board[tileLocation];
     }
 
-    public void GetAllEnemiesInRange()
+    public List<HexBehaviour> GetAllEnemiesInRange()
     {
+        UnitBehaviour currPlayingUnit = ActionManager.Instance.CurrentlySelectedPlayingUnit;
+        Vector3 currPlayingunitPosition = currPlayingUnit.CurrentHexTile.UnitAnchorWorldPositionVector;
+
+        int attackRange = currPlayingUnit.AttackComponent.AttackRange;
+
+        List<HexBehaviour> enemyHexes = currPlayingUnit.AttackComponent.GetAttackableTiles().Where(x => x.OwningTile.Occupied).ToList();
+        List<HexBehaviour> returnHexBehaviours = new List<HexBehaviour>(enemyHexes);
+       UnitBehaviour enemyUnitBehaviour;
+        foreach (HexBehaviour hexBehaviour in enemyHexes)
+        {
+            enemyUnitBehaviour = (UnitBehaviour)hexBehaviour.ObjectOnHex;
+            //probs unecessarry
+            if(enemyUnitBehaviour!=null && (!enemyUnitBehaviour.isAlive || enemyUnitBehaviour.PlayerId == ActionManager.Instance.CurrentlySelectedPlayingUnit.PlayerId))
+            {
+                returnHexBehaviours.Remove(hexBehaviour);
+            }
+        }
+
+        return returnHexBehaviours;
         //temporary this will only work for melee units whose attack range is 1
         //List<GameObject> enemiesInRange = InstantiatedUnits.Where(x=>x.GetComponent<UnitBehaviour>().CurrentHexTile.OwningTile.IsInRange )
     }

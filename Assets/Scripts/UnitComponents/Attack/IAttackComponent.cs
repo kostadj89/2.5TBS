@@ -19,6 +19,7 @@ namespace Assets.Scripts.UnitComponents.Attack
         void InitializeComponent(UnitBehaviour unitBehaviour);
 
         List<HexBehaviour> GetAttackableTiles();
+        List<HexBehaviour> GetHexesInRangeOccupiedByEnemy();
 
         bool AttackConditionFufilled(HexBehaviour targetHexBehaviour);
 

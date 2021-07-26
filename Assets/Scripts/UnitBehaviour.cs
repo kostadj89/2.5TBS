@@ -212,12 +212,12 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
     //The corresponding OnMouseOver function is called while the mouse stays over the object and OnMouseExit is called when it moves away.
     void OnMouseEnter()
     {
-        Debug.Log(gameObject.ToString() + " MouseEnter");
+       //Debug.log(gameObject.ToString() + " MouseEnter");
     }
 
     void OnMouseExit()
     {
-        Debug.Log(gameObject.ToString() + " MouseExit");
+       //Debug.log(gameObject.ToString() + " MouseExit");
     }
 
 
@@ -227,11 +227,11 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
         if (Input.GetMouseButtonUp(0) && !ActionManager.Instance.IsMoving && PlayerId != ActionManager.Instance.CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>().PlayerId && CurrentHexTile.OwningTile.ReachableNeighbours.Count() > 0)
         {
            //currentHexTile.ChangeDestinationToThis();
-            Debug.Log("UnitBehaviour OnMouseOver()(), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
+           //Debug.log("UnitBehaviour OnMouseOver()(), DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
             ActionManager.Instance.StartUnitActionOnHex(CurrentHexTile);
         }
 
-        Debug.Log(gameObject.ToString() + " MouseOver");
+       //Debug.log(gameObject.ToString() + " MouseOver");
     }
 
     #endregion
@@ -268,18 +268,26 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
         CurrentHealth -= damage;
         if (CurrentHealth <= 0)
         {
-            isAlive = false;
-
-            if (BattlefieldManager.ManagerInstance.InstantiatedUnits.Contains(this.gameObject))
-            {
-                BattlefieldManager.ManagerInstance.InstantiatedUnits.Remove(this.gameObject);
-            }
-            Destroy(this.gameObject);
+            KillUnit();
+            
         }
         else
         {
             UpdateHealthUI();
         }
+    }
+
+    private void KillUnit()
+    {
+        isAlive = false;
+
+        this.currentHexTile.OwningTile.Occupied = false;
+
+        if (BattlefieldManager.ManagerInstance.InstantiatedUnits.Contains(this.gameObject))
+        {
+            BattlefieldManager.ManagerInstance.InstantiatedUnits.Remove(this.gameObject);
+        }
+        Destroy(this.gameObject);
     }
 
     #endregion

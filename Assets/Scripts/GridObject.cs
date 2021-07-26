@@ -42,7 +42,7 @@ public abstract class GridObject
 
     public override string ToString()
     {
-        return string.Format("({0}, {1})", X, Y);
+        return "("+X+", " +Y+")";
     }
 
     public Vector2 VectorLocation()

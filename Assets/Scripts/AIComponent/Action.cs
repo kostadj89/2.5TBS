@@ -14,6 +14,6 @@ public interface IAction
     float GetScore();
     //List<HexBehaviour> GetPossibleTargetHexes();
     HexBehaviour ChosenTargetHex { get; set; }
-    List<Consideration> Considerations { get; }
+    List<IConsideration> Considerations { get; }
     ActionType ActionType { get;}
 }

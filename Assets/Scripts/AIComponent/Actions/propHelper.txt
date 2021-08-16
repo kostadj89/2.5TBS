@@ -1,0 +1,8 @@
+﻿get
+{
+	return thing;
+}
+set
+{
+	thing = value;
+}

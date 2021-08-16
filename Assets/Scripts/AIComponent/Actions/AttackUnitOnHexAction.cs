@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Assets.Scripts.AIComponent.Considerations;
 using UnityEngine;
 
 namespace Assets.Scripts.AIComponent
@@ -10,6 +11,20 @@ namespace Assets.Scripts.AIComponent
     class AttackUnitOnHexAction : IAction
     {
         private HexBehaviour chosenTargetHex;
+        private UnitBehaviour targetUnit;
+
+        public UnitBehaviour TargetUnit
+        {
+            get
+            {
+                if (targetUnit == null)
+                {
+                    targetUnit = (UnitBehaviour) ChosenTargetHex.ObjectOnHex;
+                }
+
+                return targetUnit;
+            }
+        }
         public AttackUnitOnHexAction(HexBehaviour hex)
         {
             ChosenTargetHex = hex;
@@ -20,14 +35,20 @@ namespace Assets.Scripts.AIComponent
             get { return chosenTargetHex; }
             set { chosenTargetHex = value;}
         }
-        public List<Consideration> Considerations
+        public List<IConsideration> Considerations
         {
             get { return GetConsiderations(); }
         }
 
-        private List<Consideration> GetConsiderations()
+        private List<IConsideration> GetConsiderations()
         {
-            throw new NotImplementedException();
+           List<IConsideration> considerations = new List<IConsideration>();
+
+           considerations.Add(new ConsiderEnemyHealth_Con(ChosenTargetHex));
+           considerations.Add(new TargetGetsKilled_Con(ChosenTargetHex));
+           considerations.Add(new SelfGetsKilledByRetaliation(ChosenTargetHex));
+
+           return considerations;
         }
 
         public ActionType ActionType
@@ -37,14 +58,20 @@ namespace Assets.Scripts.AIComponent
 
         public void DoAction()
         {
-            Debug.Log(string.Format("Enemy {0}, attacks hex with coordinates {1}", (AIAgent.AIAgentInstanceAgent.CurrentlyControledUnit).ToString(), (chosenTargetHex.OwningTile).ToString()));
+            Debug.Log(string.Format("Enemy {0}, attacks hex with coordinates {1}.\t Score: {2}", (AIAgent.AIAgentInstanceAgent.CurrentlyControledUnit).ToString(), (chosenTargetHex.OwningTile).ToString(),GetScore()));
             BattlefieldManager.ManagerInstance.DestinationTile = ChosenTargetHex;
             ActionManager.Instance.StartUnitActionOnHex(ChosenTargetHex);
         }
 
         public float GetScore()
         {
-            return 0.75f;
+            float score = 1;
+            foreach (IConsideration consideration in Considerations)
+            {
+                score *= consideration.Score();
+            }
+
+            return score;
         }
     }
 }

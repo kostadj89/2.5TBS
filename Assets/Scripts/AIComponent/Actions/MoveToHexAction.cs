@@ -17,8 +17,8 @@ namespace Assets.Scripts.AIComponent
             set { chosenTargetHex = value; }
         }
         
-        public List<Consideration> Considerations { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public ActionType ActionType { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public List<IConsideration> Considerations { get;set;}
+        public ActionType ActionType { get;set;}
 
         public MoveToHexAction(HexBehaviour hexBehaviour)
         {

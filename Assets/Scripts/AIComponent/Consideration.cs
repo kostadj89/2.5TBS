@@ -9,57 +9,35 @@ public enum GraphType
     Linear,
     Quadratic,
     Logistic,
-    Exponential
+    Exponential,
+    Custom
 }
 
 public enum ConsiderationInputType
 {
     TargetHealth,
-    TargetDistance,
     SelfHealth,
-    CoverDistance
+    NearestEnemyDistance,
+    NearestAllyDistance,
+    EnemyTargetDistance,
+    TargetEnemyRetaliationStrike,
+    CoverValue
 }
 
-public class Consideration : ScriptableObject
+public interface IConsideration
 {
-    public float ConsiderationInputValue;
+    HexBehaviour targetHexContex { get; set; }
+    float ConsiderationInputValue { get;}
 
-    public ConsiderationInputType ConsiderationInputType;
+    ConsiderationInputType ConsiderationInputType { get; set; }
 
-    public GraphType GraphType;
-    public float K, M;
+    GraphType GraphType { get; set; }
 
-    public Consideration(ConsiderationInputType C,float X, float K, float M, GraphType GraphType )
-    {
-        ConsiderationInputType = C;
-        ConsiderationInputValue = X;
-        this.K = K;
-        this.M = M;
-        this.GraphType = GraphType;
-    }
+    float K { get; set; }
+    float M { get; set; }
+    float C { get; set; }
+    float B { get; set; }
 
-    public float Score()
-    {
-        float Y=0;
+    float Score();
 
-        float clampedConsiderationValue = ClampConsiderationInputValue();
-        switch (GraphType)
-        {
-            case GraphType.Linear:
-                break;
-            case GraphType.Quadratic:
-                break;
-            case GraphType.Logistic:
-                break;
-            case GraphType.Exponential:
-                break;
-        }
-
-        return Y;
-    }
-
-    private float ClampConsiderationInputValue()
-    {
-        throw new NotImplementedException();
-    }
 }

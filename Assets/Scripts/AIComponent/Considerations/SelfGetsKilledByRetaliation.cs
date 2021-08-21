@@ -8,7 +8,7 @@ namespace Assets.Scripts.AIComponent.Considerations
 {
     internal class SelfGetsKilledByRetaliation : ConsiderationBase
     {
-        public SelfGetsKilledByRetaliation(HexBehaviour targetHex):base(ConsiderationInputType.SelfHealth,targetHex,0,0,0,0,GraphType.Custom)
+        public SelfGetsKilledByRetaliation(UnitBehaviour Owner, HexBehaviour targetHex):base(Owner,ConsiderationInputType.SelfHealth,targetHex,0,0,0,0,GraphType.Custom)
         {
             
         }
@@ -24,7 +24,7 @@ namespace Assets.Scripts.AIComponent.Considerations
         public override float Score()
         {
             UnitBehaviour ub = (UnitBehaviour) targetHexContex.ObjectOnHex;
-            if (ub.Damage/2f>=AIAgent.AIAgentInstanceAgent.CurrentlyControledUnit.CurrentHealth)
+            if (ub.Damage/2f>=OwnerOFConsideration.CurrentHealth)
             {
                 return 0.1f;
             }

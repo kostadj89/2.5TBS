@@ -12,8 +12,9 @@ namespace Assets.Scripts.AIComponent
     public abstract class ConsiderationBase : IConsideration
     {
         private float X=-1f;
-        public ConsiderationBase(ConsiderationInputType CI, HexBehaviour hex, float K, float M, float B, float C, GraphType GraphType)
+        public ConsiderationBase(UnitBehaviour Owner,ConsiderationInputType CI, HexBehaviour hex, float K, float M, float B, float C, GraphType GraphType)
         {
+            OwnerOFConsideration = Owner;
             ConsiderationInputType = CI;
             targetHexContex = hex;
             this.K = K;
@@ -23,6 +24,7 @@ namespace Assets.Scripts.AIComponent
             this.GraphType = GraphType;
         }
 
+        public UnitBehaviour OwnerOFConsideration { get; set; }
         public HexBehaviour targetHexContex { get; set; }
 
         public float ConsiderationInputValue
@@ -31,7 +33,7 @@ namespace Assets.Scripts.AIComponent
             {
                 if (X ==-1f)
                 {
-                    X = GetInputFromContext(ConsiderationInputType, targetHexContex);
+                    X = GetInputFromContext(ConsiderationInputType, OwnerOFConsideration, targetHexContex);
                 }
 
                 return X;
@@ -45,6 +47,7 @@ namespace Assets.Scripts.AIComponent
         public float M { get; set; }
         public float C { get; set; }
         public float B { get; set; }
+       
 
         public virtual float Score()
         {
@@ -63,7 +66,7 @@ namespace Assets.Scripts.AIComponent
             return -1;
         }
 
-        public static float GetInputFromContext(ConsiderationInputType c,HexBehaviour targetHexBehaviour)
+        public static float GetInputFromContext(ConsiderationInputType c,UnitBehaviour Owner,HexBehaviour targetHexBehaviour)
         {
             float inputValue=-10;
             switch (c)
@@ -75,7 +78,7 @@ namespace Assets.Scripts.AIComponent
 
                 case ConsiderationInputType.EnemyTargetDistance:
 
-                    inputValue = Vector3.Distance(AIAgent.AIAgentInstanceAgent.CurrentlyControledUnit.transform.position,targetHexBehaviour.UnitAnchorWorldPositionVector);
+                    inputValue = Vector3.Distance(Owner.transform.position,targetHexBehaviour.UnitAnchorWorldPositionVector);
                     break;
 
                 case ConsiderationInputType.NearestAllyDistance:
@@ -85,7 +88,7 @@ namespace Assets.Scripts.AIComponent
 
                 case ConsiderationInputType.SelfHealth:
 
-                    UnitBehaviour ub = AIAgent.AIAgentInstanceAgent.CurrentlyControledUnit;
+                    UnitBehaviour ub = Owner;
                     inputValue = (float) ub.CurrentHealth / (float) ub.MaxHealth;
                     break;
 

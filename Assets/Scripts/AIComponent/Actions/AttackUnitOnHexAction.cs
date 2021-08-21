@@ -10,8 +10,28 @@ namespace Assets.Scripts.AIComponent
 {
     class AttackUnitOnHexAction : IAction
     {
+        #region fields
+
         private HexBehaviour chosenTargetHex;
         private UnitBehaviour targetUnit;
+        private float scoredValue;
+        private bool scoreCalculated = false;
+
+        #endregion fields
+        #region props
+        public float ScoredValue
+        {
+            get
+            {
+                if (!scoreCalculated)
+                {
+                    scoredValue = GetScore();
+                    scoreCalculated = true;
+                }
+
+                return scoredValue;
+            }
+        }
 
         public UnitBehaviour TargetUnit
         {
@@ -19,46 +39,59 @@ namespace Assets.Scripts.AIComponent
             {
                 if (targetUnit == null)
                 {
-                    targetUnit = (UnitBehaviour) ChosenTargetHex.ObjectOnHex;
+                    targetUnit = (UnitBehaviour)ChosenTargetHex.ObjectOnHex;
                 }
 
                 return targetUnit;
             }
         }
-        public AttackUnitOnHexAction(HexBehaviour hex)
-        {
-            ChosenTargetHex = hex;
-        }
 
         public HexBehaviour ChosenTargetHex
         {
             get { return chosenTargetHex; }
-            set { chosenTargetHex = value;}
+            set { chosenTargetHex = value; }
         }
         public List<IConsideration> Considerations
         {
             get { return GetConsiderations(); }
         }
-
-        private List<IConsideration> GetConsiderations()
-        {
-           List<IConsideration> considerations = new List<IConsideration>();
-
-           considerations.Add(new ConsiderEnemyHealth_Con(ChosenTargetHex));
-           considerations.Add(new TargetGetsKilled_Con(ChosenTargetHex));
-           considerations.Add(new SelfGetsKilledByRetaliation(ChosenTargetHex));
-
-           return considerations;
-        }
-
         public ActionType ActionType
         {
             get { return ActionType.Attack; }
         }
 
+        public int SimulatedConsidValue { get; set; }
+        
+
+        public int SimulatedValue { get; set; }
+        public UnitBehaviour ActionOwner { get; set; }
+        #endregion props
+        #region ctor
+
+        public AttackUnitOnHexAction(UnitBehaviour Owner,HexBehaviour hex)
+        {
+            ActionOwner = Owner;
+            ChosenTargetHex = hex;
+        }
+
+        #endregion ctor
+        #region methods
+        private List<IConsideration> GetConsiderations()
+        {
+            List<IConsideration> considerations = new List<IConsideration>();
+
+            considerations.Add(new ConsiderEnemyHealth_Con(ActionOwner, ChosenTargetHex));
+            considerations.Add(new TargetGetsKilled_Con(ActionOwner, ChosenTargetHex));
+            considerations.Add(new SelfGetsKilledByRetaliation(ActionOwner, ChosenTargetHex));
+
+            return considerations;
+        }
+
+
+
         public void DoAction()
         {
-            Debug.Log(string.Format("Enemy {0}, attacks hex with coordinates {1}.\t Score: {2}", (AIAgent.AIAgentInstanceAgent.CurrentlyControledUnit).ToString(), (chosenTargetHex.OwningTile).ToString(),GetScore()));
+            Debug.Log(string.Format("Enemy {0}, attacks hex with coordinates {1}.\t Score: {2}", (AIAgent.AIAgentInstanceAgent.CurrentlyControledUnit).ToString(), (chosenTargetHex.OwningTile).ToString(), ScoredValue));
             BattlefieldManager.ManagerInstance.DestinationTile = ChosenTargetHex;
             ActionManager.Instance.StartUnitActionOnHex(ChosenTargetHex);
         }
@@ -73,5 +106,26 @@ namespace Assets.Scripts.AIComponent
 
             return score;
         }
+
+        public int Simulate(SimulatedUnit SimActionOwner,SimulatedUnit SimTarget)
+        {
+            if (SimActionOwner.UnitBehaviour.AttackType == AttackType.Melee || SimActionOwner.SimulatedHexBehaviour.OwningTile.AllNeighbours.Contains(SimTarget.SimulatedHexBehaviour.OwningTile))
+            {
+                return SimActionOwner.UnitBehaviour.Damage - SimTarget.UnitBehaviour.Damage / 2;
+            }
+            else
+            {
+                return SimActionOwner.UnitBehaviour.Damage;
+            }
+            
+        }
+
+        public void Print()
+        {
+            string s = "Attack:"+ActionOwner.ToString() + "attack unit on hex " + ChosenTargetHex.OwningTile.ToString();
+           Debug.Log(s);
+        }
+        #endregion methods
+
     }
 }

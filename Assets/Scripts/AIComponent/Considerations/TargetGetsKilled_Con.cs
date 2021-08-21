@@ -8,7 +8,7 @@ namespace Assets.Scripts.AIComponent.Considerations
 {
     class TargetGetsKilled_Con : ConsiderationBase
     {
-        public TargetGetsKilled_Con(HexBehaviour targetHex) : base(ConsiderationInputType.TargetHealth, targetHex, 0, 0, 0, 0, GraphType.Custom)
+        public TargetGetsKilled_Con(UnitBehaviour Owner, HexBehaviour targetHex) : base(Owner,ConsiderationInputType.TargetHealth, targetHex, 0, 0, 0, 0, GraphType.Custom)
         {
 
         }
@@ -22,13 +22,13 @@ namespace Assets.Scripts.AIComponent.Considerations
         public override float Score()
         {
             UnitBehaviour ub = (UnitBehaviour)targetHexContex.ObjectOnHex;
-            if (AIAgent.AIAgentInstanceAgent.CurrentlyControledUnit.Damage >= ub.CurrentHealth )
+            if (OwnerOFConsideration.Damage >= ub.CurrentHealth )
             {
                 return 1.5f;
             }
             else
             {
-                return (1-(ub.CurrentHealth- AIAgent.AIAgentInstanceAgent.CurrentlyControledUnit.Damage)/ub.MaxHealth);
+                return (1-(ub.CurrentHealth- OwnerOFConsideration.Damage)/ub.MaxHealth);
             }
 
         }

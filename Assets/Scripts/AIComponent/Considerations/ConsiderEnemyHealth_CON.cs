@@ -8,14 +8,15 @@ namespace Assets.Scripts.AIComponent.Considerations
 {
     class ConsiderEnemyHealth_Con : ConsiderationBase
     {
-        public ConsiderEnemyHealth_Con(HexBehaviour targetHex)
-        :this(ConsiderationInputType.TargetHealth, targetHex, 1, 1,0.1f,0, GraphType.Linear)
+        public ConsiderEnemyHealth_Con(UnitBehaviour Owner, HexBehaviour targetHex)
+        :this(Owner, ConsiderationInputType.TargetHealth, targetHex, 1, 1,0.1f,0, GraphType.Linear)
         {
 
         }
+       
 
-        public ConsiderEnemyHealth_Con(ConsiderationInputType CI, HexBehaviour targetHex, float K, float M, float B, float C, GraphType GraphType)
-            : base(CI, targetHex, K,M,B,C,GraphType)
+        public ConsiderEnemyHealth_Con(UnitBehaviour Owner, ConsiderationInputType CI, HexBehaviour targetHex, float K, float M, float B, float C, GraphType GraphType)
+            : base(Owner, CI, targetHex, K,M,B,C,GraphType)
         {
             
         }

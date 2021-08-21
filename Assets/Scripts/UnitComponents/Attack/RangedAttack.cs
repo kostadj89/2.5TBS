@@ -117,12 +117,48 @@ namespace Assets.Scripts.UnitComponents.Attack
             return tempAttackModifier;
         }
 
+        //for sim
+        public float CalculateDamageModifiers(HexBehaviour targetOfAttackHex,HexBehaviour attackerHex)
+        {
+            float tempAttackModifier = 1;
+
+            //// if the attacker is engaged in melee we don't take cover reductions in consideration
+            //if (IsEngagedInMelee)
+            //{
+            //    tempAttackModifier = 0.5f;
+            //}
+            ////... else we'll look all neighbouring fields of the target, and look for the occupied and fields with cover
+            //else
+            //{
+                //()
+            List<HexTile> coversTiles = targetOfAttackHex.OwningTile.AllNeighbours.Where(x =>
+                        x.Occupied == true || x.Cover == true).ToList();
+
+            tempAttackModifier = GetCoverModifier(targetOfAttackHex.OwningTile, attackerHex.OwningTile, coversTiles);
+            //}
+
+            return tempAttackModifier;
+        }
+
         //adds or substracks and damage int
         public int CalculateDamageBonuses()
         {
             int parentBaseDamage = ParentUnitBehaviour.Damage;
 
             if (ParentUnitBehaviour.CurrentHexTile.OwningTile.HighGround)
+            {
+                parentBaseDamage += 3;
+            }
+
+            return parentBaseDamage;
+        }
+
+        //for sim
+        public int CalculateDamageBonuses(HexBehaviour fromHex)
+        {
+            int parentBaseDamage = ParentUnitBehaviour.Damage;
+
+            if (fromHex.OwningTile.HighGround)
             {
                 parentBaseDamage += 3;
             }

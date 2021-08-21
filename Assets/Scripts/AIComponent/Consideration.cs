@@ -26,6 +26,7 @@ public enum ConsiderationInputType
 
 public interface IConsideration
 {
+    UnitBehaviour OwnerOFConsideration { get; set; }
     HexBehaviour targetHexContex { get; set; }
     float ConsiderationInputValue { get;}
 

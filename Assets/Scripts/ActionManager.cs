@@ -244,11 +244,11 @@ public class ActionManager : MonoBehaviour
 
         BattlefieldManager.ManagerInstance.SelectTilesInRangeSimple(ub.movementRange);
 
-        if (CurrentlySelectedPlayingUnit.PlayerId == 1)
-        {
+        //if (CurrentlySelectedPlayingUnit.PlayerId == 1)
+        //{
             AIAgent.AIAgentInstanceAgent.CurrentlyControledUnit = CurrentlySelectedPlayingUnit;
             AIAgent.AIAgentInstanceAgent.ChooseAction();
-        }
+        //}
     }
 
     #endregion turn management

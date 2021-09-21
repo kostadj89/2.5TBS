@@ -43,7 +43,7 @@ namespace Assets.Scripts.AIComponent
         public List<IConsideration> Considerations { get; set; }
         public ActionType ActionType { get { return ActionType.Move; } }
 
-        public int SimulatedValue { get; set; }
+        public decimal SimulatedValue { get; set; }
         #endregion Props
 
 
@@ -59,9 +59,28 @@ namespace Assets.Scripts.AIComponent
         #region Methods
         public void DoAction()
         {
-            Debug.Log(string.Format("Enemy {0}, moves to hex with coordinates {1}", (ActionOwner).ToString(), (chosenTargetHex.OwningTile).ToString()));
+           //Debug.Log(string.Format("Enemy {0}, moves to hex with coordinates {1}", (ActionOwner).ToString(), (chosenTargetHex.OwningTile).ToString()));
             BattlefieldManager.ManagerInstance.DestinationTile = ChosenTargetHex;
             ActionManager.Instance.StartUnitActionOnHex(ChosenTargetHex);
+        }
+
+        public decimal SimulateScoreForHealth(decimal playerHealth, decimal enemyHealth)
+        {
+            decimal scoreDecimal = playerHealth - enemyHealth;
+            return scoreDecimal;
+        }
+
+        public void SimulateAction()
+        {
+            HexBehaviour unitOldHex = BattlefieldManager.ManagerInstance.CurrentStateOfGame.Board.Values.Where(x =>
+                x == ActionOwner.CurrentHexTile).First();
+            unitOldHex.ObjectOnHex = null;
+            unitOldHex.OwningTile.Occupied = false;
+            ActionOwner.CurrentHexTile = ChosenTargetHex;
+            ChosenTargetHex.ObjectOnHex = ActionOwner;
+            ChosenTargetHex.OwningTile.Occupied = true;
+            //and acctually move unit to hex
+            ActionOwner.transform.position = ChosenTargetHex.UnitAnchorWorldPositionVector;
         }
         
         public float GetScore()
@@ -83,7 +102,7 @@ namespace Assets.Scripts.AIComponent
 
         public void Print()
         {
-            string s = "Move: "+ActionOwner.ToString() + " moves to hex " + ChosenTargetHex.OwningTile.ToString();
+            string s = "Move: "+ActionOwner.ToString() + " moves to hex " + ChosenTargetHex.OwningTile.ToString()+". SimulatedValue:"+ SimulatedValue;
             Debug.Log(s);
         }
 

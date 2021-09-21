@@ -22,12 +22,12 @@ namespace Assets.Scripts.AIComponent.Actions
             
         }
 
-        public EmptySimulatedAction(int val)
+        public EmptySimulatedAction(decimal val)
         {
             SimulatedValue = val;
         }
 
-        public int SimulatedValue { get; set; }
+        public decimal SimulatedValue { get; set; }
         public UnitBehaviour ActionOwner { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public void DoAction()
@@ -51,6 +51,17 @@ namespace Assets.Scripts.AIComponent.Actions
         {
             string s = "Empty action";
             Debug.Log(s);
+        }
+
+        public void SimulateAction()
+        {
+
+        }
+
+        public decimal SimulateScoreForHealth(decimal playerHealth, decimal enemyHealth)
+        {
+            decimal scoreDecimal = playerHealth - enemyHealth;
+            return scoreDecimal;
         }
     }
 }

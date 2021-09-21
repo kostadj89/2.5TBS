@@ -12,6 +12,8 @@ public class HexBehaviour : MonoBehaviour
     //reference to object contained on this hex
     public IIsOnHexGrid ObjectOnHex;
 
+    public int StateIndex = 0;
+
     public SpriteRenderer TileBehaviourSpriteRenderer;
 
     public Sprite NormalLookingHex;
@@ -66,8 +68,11 @@ public class HexBehaviour : MonoBehaviour
 
     private void ChangeHexVisual(Color color, Sprite sprite)
     {
-        TileBehaviourSpriteRenderer.material.color = color;
-        TileBehaviourSpriteRenderer.sprite = sprite;
+        if (StateIndex == 0)
+        {
+            TileBehaviourSpriteRenderer.material.color = color;
+            TileBehaviourSpriteRenderer.sprite = sprite;
+        }
     }
 
     private void ChangeHexVisual(Color color)

@@ -105,8 +105,10 @@ namespace Assets.Scripts.AIComponent
 
                 case ConsiderationInputType.TargetHealth:
                     UnitBehaviour enemyUB = (UnitBehaviour) targetHexBehaviour.ObjectOnHex;
-
-                    inputValue = enemyUB.CurrentHealth;
+                    if (enemyUB != null)
+                        inputValue = enemyUB.CurrentHealth;
+                    else
+                        inputValue = 0;
                     break;
             }
 

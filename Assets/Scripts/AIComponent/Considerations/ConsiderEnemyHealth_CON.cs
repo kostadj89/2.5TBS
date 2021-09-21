@@ -13,23 +13,16 @@ namespace Assets.Scripts.AIComponent.Considerations
         {
 
         }
-       
 
         public ConsiderEnemyHealth_Con(UnitBehaviour Owner, ConsiderationInputType CI, HexBehaviour targetHex, float K, float M, float B, float C, GraphType GraphType)
             : base(Owner, CI, targetHex, K,M,B,C,GraphType)
         {
             
         }
-        public float ConsiderationInputValue { get; set; }
 
         public ConsiderationInputType ConsiderationInputType
         {
             get { return ConsiderationInputType.TargetHealth; }
         }
-
-        public GraphType GraphType { get; set; }
-        public float K { get; set; }
-        public float M { get; set; }
-       
     }
 }

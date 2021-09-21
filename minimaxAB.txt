@@ -1,0 +1,121 @@
+MINIMAX
+*****kratka istorija ai koja igra igre******
+
+The core loop of the Minimax algorithm alternates between player 1 and player
+2—such as the white and black player in Chess—named the min and the max player.
+For each player, all possible moves are explored. For each of the resulting states,
+all possible moves by the other player are also explored, and so on until all the
+possible combinations of moves have been explored to the point where the game
+ends (e.g., with a win, a loss or a draw). The result of this process is the generation
+of the whole game tree from the root node down to the leaves. The outcome of the
+game informs the utility function which is applied onto the leaf nodes. The utility
+function estimates how good the current game configuration is for a player. Then, the
+algorithm traverses up the search tree to determine what action each player would
+have taken at any given state by backing-up values from leaves through the branch
+nodes. In doing so, it assumes that each player tries to play optimally. Thus, from
+the standpoint of the max player, it tries to maximize its score, whereas min tries to
+minimize the score of max; hence, the name Minimax. In other words, a max node of
+the tree computes the max of its child values whereas a min node computes the min
+of its child values. The optimal winning strategy is then obtained for max if, on min’s
+turn, a win is obtainable for max for all moves that min can make. The corresponding
+optimal strategy for min is when a win is possible independently of what move max
+will take. To obtain a winning strategy for max, for instance, we start at the root of
+the tree and we iteratively choose the moves leading to child nodes of highest value
+(on min’s turn the child nodes with the lowest value are selected instead). Figure 2.6
+illustrates the basic steps of Minimax through a simple example.
+Of course, exploring all possible moves and countermoves is infeasible for any
+game of interesting complexity, as the size of the search tree increases exponentially
+with the depth of the game or the number of moves that are simulated. Indicatively,
+tic-tac-toe has a game tree size of 9! = 362,880 states which is feasible to traverse
+through; however, the Chess game tree has approximately 10154 nodes which is
+infeasible to search through with modern computers. Therefore, almost all actual
+applications of the Minimax algorithm cut off search at a given depth, and use a state
+evaluation function to evaluate the desirability of each game state at that depth. For
+example, in Chess a simple state evaluation function would be to merely sum the
+number of white pieces on the board and subtract the number of black pieces; the
+higher this number is, the better the situation is for the white player. (Of course,
+much more sophisticated board evaluation functions are commonly used.) Together
+with improvements to the basic Minimax algorithm such as α-β pruning and the
+use of non-deterministic state evaluation functions, some very competent programs
+emerged for many classic games (e.g., IBM’s Deep Blue). More information about
+Minimax and other adversarial search algorithms can be found in Chapter 6 of [582]
+
+******* Basic Minimax ************
+Za određenu poziciju u stablu igre iz perspektive početnog igrača, program za pretragu mora pronaći potez koji vodi do najvećih šansi za pobedu (ili barem nerešeno stanje). Umesto da razmatra samo trenutno stanje igre i dostupne poteze u tom stanju, program mora uzeti u obzir sve poteze koje je bi njegov protivnik mogao da povuče nakon svakog poteza. Program pretpostavlja da postoji funkcija evaluacije Oceni(stanje, igrač) koji vraća ceo broj koji predstavlja rezultat
+stanja igre iz perspektive igrača; manji brojevi (koji mogu biti negativni) opisuju slabije pozicije.
+Drvo igre je prošireno razmatranjem budućih stanja nakon što je povučeno n poteza.
+Na svakom nivou drveta se naizmenično menja uloga procenjivača. Započinje se od korena drveta, gde je maksimizator, čiji je cilj da od dobijenih evaluacija uzme onu sa najboljim rezultatom, i time izabrao onaj potez koji je najbolji za igrača čije se početno stanje procenjuje. Nakon toga na sledećem nivou drveta, nastupa minimizator, kome je cilj da od mogućih, izabere najmanju ocenu. Dakle na svakom neparnom nivou program pretpostavlja da igra igrač čija se trenutna pozicija(stanje u igri) ocenjuje, a da na svakom parnom, igra njegov protivnik.
+Naravno jedan od uslova je da program može da gleda konačan broj poteza unapred. Taj broj se fiksira i naziva se dubina pretrage{proveri kod janicica}
+
+pseudo-code
+--------------
+Minimax Summary
+Best, Average, Worst: O(b^ply)
+bestmove (s, player, opponent)
+ original = player [A]
+ [move, score] = minimax (s, ply, player, opponent)
+ return move
+end
+minimax (s, ply, player, opponent)
+ best = [null, null]
+ if ply is 0 or there are no valid moves then [B]
+ score = evaluate s for original player
+ return [null, score]
+ foreach valid move m for player in state s do
+ execute move m on s
+ [move, score] = minimax(s, ply-1, opponent, player)[C]
+ undo move m on s
+ if player is original then[D]
+ if score > best.score then best = [m, score]
+ else
+ if score < best.score then best = [m, score]
+ return best
+end
+------
+A Remember original player since evaluation is always from that player’s perspec‐
+tive.
+B If no more moves remain, player might have won (or lost), which is equivalent
+to reaching target ply depth.
+C With each recursive call, swap player and opponent to reflect alternating turns.
+D Successive levels alternate between MAX or MIN.
+---------
+
+Input/Output
+Minimax looks ahead a fixed number of moves, which is called the ply depth.
+Minimax returns a move from among the valid moves that leads to the best future
+game state for a specific player, as determined by the evaluation function
+--------------------------------------------
+Context
+Evaluating the game state is complex, and we must resort to heuristic evaluations to
+determine the better game state. Indeed, developing effective evaluation functions
+for games such as chess, checkers, or Othello is the greatest challenge in designing
+intelligent programs. We assume these evaluation functions are available.
+The size of the game tree is determined by the number of available moves, b, at each
+game state. For most games, we can only estimate the value of b. For tic-tac-toe (and
+other games such as Nine Men’s Morris) there are b available moves in the initial
+empty game state, and each move takes away a potential move from the opponent. If
+the ply depth is d, the number of game states checked for tic-tac-toe is
+
+{formula}
+
+where b! is the factorial of b. To give an example of the scale involved, Minimax
+evaluates 187,300 states when b = 10 and d = 6.
+During the recursive invocation within Minimax, the score(state, player) evalua‐
+tion function must be consistently applied using the original player for whom a
+move is being calculated. This coordinates the minimum and maximum recursive
+evaluations
+-----------------------------
+Minimax can rapidly become overwhelmed by the sheer number of game states
+generated during the recursive search. In chess, where the average number of moves
+on a board is 30 (Laramée, 2000), looking ahead just five moves (i.e., b = 30,
+d = 5) requires evaluating up to 25,137,931 board positions, as determined by the
+expression:
+∑b^i
+(i = 0->d)
+
+Minimax can take advantage of symmetries in the game state, such as rotations or
+reflections of the board, by caching past states viewed (and their respective scores),
+but the savings are game-specific.
+**********NegMax************
+samo pomenem
+*********Minimax alpha beta pruning*******

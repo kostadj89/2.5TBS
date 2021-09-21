@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="BattlefieldManager" Collapsed="true">
+    <Position X="1.5" Y="1.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>ABQAAAAAAKAUIC4ECAIAgoAECGQCSCAAIQCYICOAAEM=</HashCode>
+      <FileName>Assets\Scripts\BattlefieldManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ActionManager" Collapsed="true">
+    <Position X="4.5" Y="1.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAQgAAAAICAABAAQAQAAAAAQAACAAAECQAAIAACIAEA=</HashCode>
+      <FileName>Assets\Scripts\ActionManager.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BattlefieldSpecialHex">
+    <Position X="5.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AiYCAIAAASAAgiAAAAAAAgEAAAAAQAAAIBAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\BattlefieldSpecialHex.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="GridObject" Collapsed="true">
+    <Position X="12.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAIAAIAAAAAAAAAAAAAAAAAAYAA=</HashCode>
+      <FileName>Assets\Scripts\GridObject.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="HexTile" Collapsed="true">
+    <Position X="10.75" Y="4.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABACAAAEAgAAAIEAAAIAAAAAAAAAACAACAgECAAAAg=</HashCode>
+      <FileName>Assets\Scripts\HexTile.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="HexBehaviour" Collapsed="true">
+    <Position X="7" Y="4.75" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>UABQhAEAAQAAAEAAAABigCAAEACAAIAAgACCAAASAEA=</HashCode>
+      <FileName>Assets\Scripts\HexBehaviour.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Path&lt;Node&gt;" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="10.75" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgABABAAAAAAAAAAAAAAAEgAABAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Pathfinder.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="PriorityQueue&lt;P, V&gt;" Collapsed="true">
+    <Position X="8.5" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAAgAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Pathfinder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Pathfinder" Collapsed="true">
+    <Position X="12.5" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAgAAAAAAAAAAAAAAIBAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\Pathfinder.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UIHealthBar" Collapsed="true">
+    <Position X="8.75" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAACAEAAIAAAAAAAABAAAAAAAAAAAAAAAAAEA=</HashCode>
+      <FileName>Assets\Scripts\UIHealthBar.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="UnitBehaviour" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="3.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BoQCATCAASAJCAEAJAZAICwAUABCBYIAABBIhQEYAAA=</HashCode>
+      <FileName>Assets\Scripts\UnitBehaviour.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="UnitUI" Collapsed="true">
+    <Position X="7.25" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAgASAAQAIAAAgAAAAAAAAAgAAAABAAAAAAAEA=</HashCode>
+      <FileName>Assets\Scripts\UnitUI.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="Point" Collapsed="true">
+    <Position X="8.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAA=</HashCode>
+      <FileName>Assets\Scripts\GridObject.cs</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Interface Name="IHasNeighbours&lt;N&gt;">
+    <Position X="10.75" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\GridObject.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="IIsOnHexGrid">
+    <Position X="3.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\HexBehaviour.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="Assets.Scripts.ITakesDamage">
+    <Position X="4.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\ITakesDamage.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Enum Name="BattlefieldSpecialHexType">
+    <Position X="7" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAECAAAAA=</HashCode>
+      <FileName>Assets\Scripts\BattlefieldSpecialHex.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="UnitAction" Collapsed="true">
+    <Position X="0.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAIAAAAAAAAAAAAAAAIQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\UnitBehaviour.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="UnitState" Collapsed="true">
+    <Position X="2.25" Y="8.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAABAAAAQAAAAAAAAAAAAAAAAAAAAAABAAAAAIAA=</HashCode>
+      <FileName>Assets\Scripts\UnitBehaviour.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="MovementType" Collapsed="true">
+    <Position X="2" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>Assets\Scripts\UnitBehaviour.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="AttackType" Collapsed="true">
+    <Position X="0.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAAAAAAAAAAAABAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Assets\Scripts\UnitBehaviour.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

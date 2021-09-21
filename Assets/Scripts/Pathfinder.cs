@@ -147,7 +147,7 @@ public static class Pathfinder
 
     private static double Estimate(HexTile tile1, HexTile tile2)
     {
-        return 1;//tile1.Hazadours?15:1;
+        return 1;
     }
 
     private static double Distance(HexTile tile, HexTile destTile)

@@ -23,6 +23,8 @@ namespace Assets.Scripts.UnitComponents.Attack
 
         bool AttackConditionFufilled(HexBehaviour targetHexBehaviour);
 
-        float CalculateDamageModifiers();
+        float CalculateDamageModifiers(IIsOnHexGrid target);
+
+        void ResolveDamage(UnitBehaviour targetEnemy);
     }
 }

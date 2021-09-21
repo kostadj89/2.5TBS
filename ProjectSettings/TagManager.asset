@@ -5,6 +5,12 @@ TagManager:
   serializedVersion: 2
   tags:
   - Tile
+  - State no.1
+  - State no.2
+  - State no.3
+  - State no.4
+  - State no.-1
+  - UnitTempCopy
   layers:
   - Default
   - TransparentFX

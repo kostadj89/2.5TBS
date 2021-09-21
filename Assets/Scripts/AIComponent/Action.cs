@@ -21,8 +21,13 @@ public interface IAction
     ActionType ActionType { get;}
     float ScoredValue { get; }
 
+    //for minimax2
+    void SimulateAction();
+
     //for minimax simulates action to get score
     int Simulate(SimulatedUnit SimActionOwner, SimulatedUnit target);
     int SimulatedConsidValue { get; set; }
-    int SimulatedValue { get; set; }
+    decimal SimulatedValue { get; set; }
+
+    decimal SimulateScoreForHealth(decimal currentPlayerHealth, decimal currentEnemyHealth);
 }

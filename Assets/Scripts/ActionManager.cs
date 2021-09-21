@@ -64,7 +64,7 @@ public class ActionManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (BattlefieldManager.ManagerInstance.CombatStarted)
+        if (BattlefieldManager.ManagerInstance.CombatStarted && CurrentlySelectedPlayingUnit!= null && CurrentlySelectedPlayingUnit.currentStateIndex == 0)
         {
             switch (CurrentlySelectedPlayingUnit.CurrentState)
             {
@@ -140,19 +140,20 @@ public class ActionManager : MonoBehaviour
     // selects next unit in instantiated queque 
     public void SelectNextPlayingUnit()
     {
-        int currentIndex = BattlefieldManager.ManagerInstance.InstantiatedUnits.IndexOf(OwningUnit);
-        int nextIndex;
+        BattlefieldManager.ManagerInstance.CurrentStateOfGame.GetNextUnit();
+        //int currentIndex = BattlefieldManager.ManagerInstance.CurrentStateOfGame.InstantiatedUnits.IndexOf(OwningUnit);
+        //int nextIndex;
 
-        if (currentIndex == BattlefieldManager.ManagerInstance.InstantiatedUnits.Count - 1)
-        {
-            nextIndex = 0;
-        }
-        else
-        {
-            nextIndex = currentIndex + 1;
-        }
+        //if (currentIndex == BattlefieldManager.ManagerInstance.CurrentStateOfGame.InstantiatedUnits.Count - 1)
+        //{
+        //    nextIndex = 0;
+        //}
+        //else
+        //{
+        //    nextIndex = currentIndex + 1;
+        //}
 
-        CurrentlySelectedPlayingUnit = BattlefieldManager.ManagerInstance.InstantiatedUnits[nextIndex].GetComponent<UnitBehaviour>();
+        //CurrentlySelectedPlayingUnit = BattlefieldManager.ManagerInstance.CurrentStateOfGame.InstantiatedUnits[nextIndex].GetComponent<UnitBehaviour>();
     }
 
     public void StartCurrentlyPlayingUnitTurn()
@@ -172,6 +173,8 @@ public class ActionManager : MonoBehaviour
     {
         //UnitBehaviour ub = CurrentlySelectedPlayingUnit.GetComponent<UnitBehaviour>();
         CurrentlySelectedPlayingUnit = ub;
+
+        BattlefieldManager.ManagerInstance.CurrentStateOfGame.currentPlayerId = ub.PlayerId;
 
         //sets starting tile
         BattlefieldManager.ManagerInstance.SetupStartingTile(CurrentlySelectedPlayingUnit.CurrentHexTile);
@@ -196,21 +199,16 @@ public class ActionManager : MonoBehaviour
         //...reseting starting and destination tiles in order to destroy path...
         BattlefieldManager.ManagerInstance.StartingHexBehaviorTile = null;
 
-       //Debug.log("EndCurrentPlayingUnitTurn, should be null,  StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates: "null"));
-
         BattlefieldManager.ManagerInstance.DestinationTile = null;
-       //Debug.log("EndCurrentPlayingUnitTurn(), should be null, DestinationTile: " + (BattlefieldManager.ManagerInstance.DestinationTile ? BattlefieldManager.ManagerInstance.DestinationTile.coordinates : "null"));
 
         //...this destroys path when the unit reaches destination...
         BattlefieldManager.ManagerInstance.GenerateAndShowPath();
 
-        //CurrentlySelectedPlayingUnit.HideUnitUI();
         CurrentlySelectedPlayingUnit.CurrentState = UnitState.Idle;
 
         //detarget targeted unit
         if (TargetedUnit != null)
         {
-           // TargetedUnit.HideUnitUI();
             TargetedUnit = null;
         }
 
@@ -232,23 +230,18 @@ public class ActionManager : MonoBehaviour
 
         //SetMovingState(false);
 
-        //speed = ub.speed;
-        //rotationSpeed = ub.rotationSpeed;
-
         //ResetTilesInRange resets tiles which were in movement range of previous unit
         BattlefieldManager.ManagerInstance.ResetTilesInRange();
 
         BattlefieldManager.ManagerInstance.StartingHexBehaviorTile = ub.CurrentHexTile;
 
-       //Debug.log("SetupCurrentlyOwningUnit(UnitBehaviour ub), StartingHexBehaviorTile: " + (BattlefieldManager.ManagerInstance.StartingHexBehaviorTile ? BattlefieldManager.ManagerInstance.StartingHexBehaviorTile.coordinates : "null"));
-
         BattlefieldManager.ManagerInstance.SelectTilesInRangeSimple(ub.movementRange);
 
-        //if (CurrentlySelectedPlayingUnit.PlayerId == 1)
-        //{
+        if (CurrentlySelectedPlayingUnit.PlayerId == 1  || CurrentlySelectedPlayingUnit.PlayerId == 0)//||  BattlefieldManager.ManagerInstance.CurrentStateOfGame.indexOfPreviousState)
+        {
             AIAgent.AIAgentInstanceAgent.CurrentlyControledUnit = CurrentlySelectedPlayingUnit;
             AIAgent.AIAgentInstanceAgent.ChooseAction();
-        //}
+        }
     }
 
     #endregion turn management

@@ -1,0 +1,5 @@
+-summary master rada
+-1. glava opšte o VI, Igrama, još primera iz istorije igara, i Unity
+-2. glava konačni automati i stablo ponašanja + IAUS
+-3. neinformisane informisane montekarlo i pseudo kod za minimax
+boldovanje stvari za koje nisam to uradio

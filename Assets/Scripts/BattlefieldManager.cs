@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using System.Security.Cryptography.X509Certificates;
+using Assets.Scripts;
 using UnityEngine;
 using UnityEngine.Scripting;
 using Random = UnityEngine.Random;
@@ -47,11 +48,16 @@ public class BattlefieldManager : MonoBehaviour
     public GameObject[] UnitsToPlace;
     //List Of BattlefieldObjects
     public GameObject BattlefieldObjectToPlace;
-    public List<GameObject> InstantiatedUnits;
+    //public List<GameObject> InstantiatedUnits;
 
-    public List<GameObject> InstantiatedBattlefieldObjects;
+    //public List<GameObject> InstantiatedBattlefieldObjects;
     //unit whose turn it is
+    //Board
+    //private Dictionary<Point, HexBehaviour> Board;
 
+    public List<StateOfGame> StatesOfGame;
+    public int CurrentStateIndex = 0;
+    public StateOfGame CurrentStateOfGame; 
 
     //Path
     //game object which represents lines of path, dots
@@ -60,8 +66,7 @@ public class BattlefieldManager : MonoBehaviour
     //list which hold the path lines, dots, and represents our path
     public List<GameObject> Path;
 
-    //Board
-    private Dictionary<Point, HexBehaviour> Board;
+  
 
     //Combat has begun
     public bool CombatStarted = false;
@@ -80,6 +85,9 @@ public class BattlefieldManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        StatesOfGame = new List<StateOfGame>();
+        StatesOfGame.Add(new StateOfGame());
+        CurrentStateOfGame = StatesOfGame[0];
         //initializing hexes
         SetHexSize();
         CalculateInitialPosition();
@@ -91,7 +99,9 @@ public class BattlefieldManager : MonoBehaviour
        
         //setup first playing unit
         CombatStarted = true;
-        ActionManager.Instance.StartCurrentlyPlayingUnitTurn(InstantiatedUnits[0].GetComponent<UnitBehaviour>());
+
+        CurrentStateOfGame.currentPlayerId = 0;
+        ActionManager.Instance.StartCurrentlyPlayingUnitTurn(CurrentStateOfGame.InstantiatedUnits[0].GetComponent<UnitBehaviour>());
     }
 
     private void CreateAIAgent()
@@ -134,7 +144,7 @@ public class BattlefieldManager : MonoBehaviour
         int rX, rY;
         Point p;
 
-        InstantiatedBattlefieldObjects = new List<GameObject>();
+        StatesOfGame[0].InstantiatedBattlefieldObjects = new List<GameObject>();
 
         GameObject currentBattlefieldObject;
         BattlefieldSpecialHex battlefieldSpecialHex;
@@ -146,18 +156,18 @@ public class BattlefieldManager : MonoBehaviour
  
            p = new Point(rX, rY);
 
-           if (Board.ContainsKey(p) && Board[p].ObjectOnHex == null)
+           if (StatesOfGame[0].Board.ContainsKey(p) && StatesOfGame[0].Board[p].ObjectOnHex == null)
            {
                currentBattlefieldObject =
-                   Instantiate(BattlefieldObjectToPlace, Board[p].transform.position, Quaternion.identity);
+                   Instantiate(BattlefieldObjectToPlace, StatesOfGame[0].Board[p].transform.position, Quaternion.identity);
 
                battlefieldSpecialHex = currentBattlefieldObject.GetComponent<BattlefieldSpecialHex>();
             
                //instantiate special hex
-               battlefieldSpecialHex.InstatiateSpecialHex(Board[p]);
+               battlefieldSpecialHex.InstatiateSpecialHex(StatesOfGame[0].Board[p]);
 
-               //add to the list of Objects
-               InstantiatedBattlefieldObjects.Add(currentBattlefieldObject);
+                //add to the list of Objects
+                StatesOfGame[0].InstantiatedBattlefieldObjects.Add(currentBattlefieldObject);
 
                i++;
            }
@@ -170,14 +180,14 @@ public class BattlefieldManager : MonoBehaviour
     {
         //instantiating and placing units
         int k = 0,j=0;
-        InstantiatedUnits = new List<GameObject>();
+        StatesOfGame[0].InstantiatedUnits = new List<GameObject>();
 
         for (int i = 0; i < UnitsToPlace.Length;)
         {
             //Point placementPoint = new Point(-k, i);
             Point placementPoint = j % 2 == 0? new Point(9-k,j) : new Point(-k, j);
 
-            if (Board.ContainsKey(placementPoint) && Board[placementPoint].ObjectOnHex == null)
+            if (StatesOfGame[0].Board.ContainsKey(placementPoint) && StatesOfGame[0].Board[placementPoint].ObjectOnHex == null)
             {
                 GameObject unitGameObject = (GameObject)Instantiate(UnitsToPlace[i]);
 
@@ -185,6 +195,7 @@ public class BattlefieldManager : MonoBehaviour
 
                 UnitBehaviour ub = unitGameObject.GetComponent<UnitBehaviour>();
                 SetupPlayerId(ub, i);
+                ub.UniqueUnitId = i;
 
                 ub.InitializeMovementComponent();
                 ub.InitializeAttackComponent();
@@ -193,7 +204,7 @@ public class BattlefieldManager : MonoBehaviour
                 ub.ShowUnitUI();
 
                 //add to instantiated list
-                InstantiatedUnits.Add(unitGameObject);
+                StatesOfGame[0].InstantiatedUnits.Add(unitGameObject);
 
                 i++;
             }
@@ -207,7 +218,7 @@ public class BattlefieldManager : MonoBehaviour
         }
 
         //ordering by Initiative
-        InstantiatedUnits.OrderByDescending(x => x.GetComponent<UnitBehaviour>());
+        StatesOfGame[0].InstantiatedUnits.OrderByDescending(x => x.GetComponent<UnitBehaviour>());
     }
 
     private void SetupPlayerId(UnitBehaviour ub, int i)
@@ -217,7 +228,7 @@ public class BattlefieldManager : MonoBehaviour
 
     public HexBehaviour GeTileBehaviourFromPoint(Point tileLocation)
     {
-        return Board[tileLocation];
+        return CurrentStateOfGame.Board[tileLocation];
     }
 
     public List<HexBehaviour> GetAllEnemiesInRange()
@@ -233,6 +244,11 @@ public class BattlefieldManager : MonoBehaviour
         foreach (HexBehaviour hexBehaviour in enemyHexes)
         {
             enemyUnitBehaviour = (UnitBehaviour)hexBehaviour.ObjectOnHex;
+
+            if (enemyUnitBehaviour==null)
+            {
+                returnHexBehaviours.Remove(hexBehaviour);
+            }
             //probs unecessarry
             if(enemyUnitBehaviour!=null && (!enemyUnitBehaviour.isAlive || enemyUnitBehaviour.PlayerId == ActionManager.Instance.CurrentlySelectedPlayingUnit.PlayerId))
             {
@@ -248,7 +264,7 @@ public class BattlefieldManager : MonoBehaviour
     //resets all tiles
     public void ResetTilesInRange()
     {
-        List<HexBehaviour> previousTilesInRange = Board.Values.Where(x => x.OwningTile.IsInRange == true).ToList();
+        List<HexBehaviour> previousTilesInRange = CurrentStateOfGame.Board.Values.Where(x => x.OwningTile.IsInRange == true).ToList();
         foreach (HexBehaviour tile in previousTilesInRange)
         {
             tile.OwningTile.IsInRange = false;
@@ -259,7 +275,7 @@ public class BattlefieldManager : MonoBehaviour
     //select all tiles in range and marks them as in range
     internal void SelectTilesInRangeSimple(int movementRange)
     {
-        if (!Board.ContainsValue(this.StartingHexBehaviorTile))
+        if (!CurrentStateOfGame.Board.ContainsValue(this.StartingHexBehaviorTile))
         {
             return;
         }
@@ -285,7 +301,7 @@ public class BattlefieldManager : MonoBehaviour
 
     internal List<HexBehaviour> GetTilesInRange(Vector3 startingTileVector3,int range)
     {
-        return Board.Values.Where(b =>
+        return CurrentStateOfGame.Board.Values.Where(b =>
             Vector3.Distance(startingTileVector3, b.UnitAnchorWorldPositionVector) <=
             range * DISTANCE_BETWEEN_HEXES).ToList();
     }
@@ -298,10 +314,10 @@ public class BattlefieldManager : MonoBehaviour
 
     private void PlaceUnitOnCoordinates(UnitBehaviour ub, Point placementPoint)
     {
-        ub.transform.position = Board[placementPoint].UnitAnchorWorldPositionVector;
+        ub.transform.position = StatesOfGame[0].Board[placementPoint].UnitAnchorWorldPositionVector;
 
         
-        ub.CurrentHexTile = Board[placementPoint];
+        ub.CurrentHexTile = StatesOfGame[0].Board[placementPoint];
         ub.CurrentHexTile.OwningTile.Occupied = true;
         ub.CurrentHexTile.ObjectOnHex = ub;
     }
@@ -330,7 +346,7 @@ public class BattlefieldManager : MonoBehaviour
         //Vector2 gridSize = 
         GameObject HexGridGO = new GameObject("HexGrid");
 
-        Board = new Dictionary<Point, HexBehaviour>();
+        StatesOfGame[0].Board = new Dictionary<Point, HexBehaviour>();
 
         for (int y = 0; y < gridHeightInHexes; y++)
         {
@@ -357,7 +373,7 @@ public class BattlefieldManager : MonoBehaviour
                 tb.UnitAnchorWorldPositionVector = hex.transform.position - new Vector3(0f, 0.36f, 0f);
 
                 //adding Tile to dictionary
-                Board.Add(tb.OwningTile.Location, tb);
+                StatesOfGame[0].Board.Add(tb.OwningTile.Location, tb);
 
                 /*//variable to indicate if all rows have the same number of hexes in them
         //this is checked by comparing width of the first hex row plus half of the hexWidth with groundWidth
@@ -367,15 +383,15 @@ public class BattlefieldManager : MonoBehaviour
         }
         
         //Neighboring tile coordinates of all the tiles are calculated
-        foreach (HexBehaviour behaviour in Board.Values)
-            behaviour.OwningTile.FindNeighbours(Board, new Vector2(gridWidthInHexes, gridHeightInHexes));
+        foreach (HexBehaviour behaviour in StatesOfGame[0].Board.Values)
+            behaviour.OwningTile.FindNeighbours(StatesOfGame[0].Board, new Vector2(gridWidthInHexes, gridHeightInHexes));
     }
 
     //probbably redundant
     internal Vector3 GetUnitAnchorFromATileOnBoard(Vector2 tileGridPosition)
     {
         Point targetPoint = new Point((int)tileGridPosition.x, (int)tileGridPosition.y);
-        return Board[targetPoint].UnitAnchorWorldPositionVector;
+        return CurrentStateOfGame.Board[targetPoint].UnitAnchorWorldPositionVector;
     }
 
     private void SetHexSprite(GameObject hex, HexBehaviour tb)
@@ -458,6 +474,72 @@ public class BattlefieldManager : MonoBehaviour
         DrawPath(path);
     }
 
+    //we're creating a new game state and adding it to the StatesOfGame list
+    public void CreateNewAndChangeCurrentGameStat()
+    {
+        int lastIndexOfStates = StatesOfGame.Count;
+        StatesOfGame.Add(CurrentStateOfGame.CreateCopyOfTheState());
+
+        CurrentStateOfGame = StatesOfGame[lastIndexOfStates];
+        CurrentStateIndex = CurrentStateOfGame.IndexOfState;
+    }
+
+    //when we return from simulated state, we delete it
+    public void ReturnToPreviousState()
+    {
+        //int prevIndex = CurrentStateOfGame.indexOfPreviousState != null
+        //    ? CurrentStateOfGame.indexOfPreviousState.Value
+        //    : 0;
+        //StateOfGame state = StatesOfGame.First(x => x.IndexOfState == CurrentStateOfGame.IndexOfState);
+        //int indexInStatesOfGame = StatesOfGame.IndexOf(state);
+        //CurrentStateOfGame.Clear();
+        ActionManager.Instance.CurrentlySelectedPlayingUnit = CurrentStateOfGame.previouslyControlledUnit;
+        AIAgent.AIAgentInstanceAgent.CurrentlyControledUnit = CurrentStateOfGame.previouslyControlledUnit;
+
+        StatesOfGame.RemoveAt(CurrentStateOfGame.IndexOfState);
+        CurrentStateOfGame.Clear();
+
+        CurrentStateOfGame = StatesOfGame[CurrentStateOfGame.indexOfPreviousState.Value];
+        CurrentStateIndex = CurrentStateOfGame.IndexOfState;
+    }
+
+    //public void CreateNewStateForAction(IAction action)
+    //{
+    //    int lastIndexOfStates = StatesOfGame.Count;
+    //    StatesOfGame.Add(CurrentStateOfGame.CreateCopyOfTheState());
+
+        
+    //}
+
+    //end it all call, maybe not needed, goes back to original state, and deletes the rest
+    public void RevertToOriginalGameState()
+    {
+        CurrentStateOfGame = StatesOfGame[0];
+        CurrentStateIndex = 0;
+
+        //ActionManager.Instance.CurrentlySelectedPlayingUnit = CurrentStateOfGame.previouslyControlledUnit;
+        //AIAgent.AIAgentInstanceAgent.CurrentlyControledUnit = CurrentStateOfGame.previouslyControlledUnit;
+       
+        //delete leftover states
+        if (StatesOfGame.Count>1)
+        {
+            StatesOfGame.RemoveRange(1, StatesOfGame.Count - 1);
+        }
+
+        //DestroyAllToDeleteObjects();
+
+        StartingHexBehaviorTile = ActionManager.Instance.CurrentlySelectedPlayingUnit.CurrentHexTile;
+    }
+
+    void DestroyAllToDeleteObjects()
+    {
+        GameObject[] gameObjectsWithTag = GameObject.FindGameObjectsWithTag("ToDelete");
+
+        for (var i = 0; i < gameObjectsWithTag.Length; i++)
+        {
+            Destroy(gameObjectsWithTag[i]);
+        }
+    }
     #endregion Public Methods
 
 

@@ -1,0 +1,6 @@
+termini:
+stablo pretrage
+učenje nagrađivanjem
+stablo ponašanja
+konačni automati
+prostora stanja. 

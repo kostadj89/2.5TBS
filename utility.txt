@@ -1,0 +1,29 @@
+VEŠTAČKA INTELIGENCIJA ZASNOVANA NA TEORIJI KORISNOSTI
+1.	 	UVOD
+Jedan od osnovnih problema veštačke inteligencije je donošenje odluka, postoji više pristupa rešavanju ovog problema. U industriji video igara jedan od pristupa koji se izdvojio jeste sistem zasnovan na teoriji korisnosti (utility-based system).
+Uopšteno govereći, u ovom sistemu svim mogućim akcijama biva dodeljena vrednost, nakon čega se izabere jedna ili nekoliko akcija sa najvišim vrednostima. Ovo je jednostavan pristup, i njegov pregled će biti izložen u ovom podglavlju.
+
+2.	 	KORISNOST
+Teorija korisnosti kao koncept postoji još pre video igara i računara, i koristi se u teoriji igara, ekonomiji i brojnim drugim poljima.
+Glavna ideja iza ove teorije je da se svaka moguća akcija ili stanje u datom modelu, može opisati jednom vredošću. Ova vrednost predstavlja korisnost date akcije u odnosu na relevantni kontekst. 
+Korisnost nije fiksna vrednost nego funkcija, koja nastaje razmatranjem raznih faktora, ona meri koliko nam je nesto potrebno, i menja se iz trenutka u trenutak u raznim kontekstima. 
+Na primer, korisnost flastera je relativno mala dok nemam povrede, medjutim u slucaju neke posekotine, ona bi se povecala.
+
+Kada računamo vrednosti korisnosti, važno je da budemo koizistentni. Zato što se ove vrednosti porede ne bi li se došlo do konačne odluke, važno je da budu na istoj skali u celom sistemu. Vrednosti se često mogu kombinovati u novu vrednost i zato se, najčešće, koriste normalizovane vrednosti ( vrednosti u granicama između 0 i 1). Naravno, vrednosti mogu biti i u drugim granicama.
+
+3. MAKSIMALNA OČEKIVANA KORISNOST
+Ključ za donošenje odluke koristeći VI zasnovanu na korisnosti je da se izračuna korisnost svake akcije koju agent može da izabere, a zatim izabere ona sa najvećom korisnošću. Naravno većina igara su nedeterminističke tako da računanje korisnosti ponekad nije moguće.
+Teško je znati koja akcija je poželjnija ako se ne može odrediti rezultat te akcije. Kada bismo mogli da izračunamo drvo igre partije šaha, ocenjivanje poteza ne bi bilo potrebno, jednostavno bismo izabrali put koji nas vodi do pobede, ali trenutno nemamo tu mogućnost. VI zasnovana na korisnosti može napraviti "najbolje odluke", ukoliko je sistem ocenjivanja dovoljno dobar.
+Najčešća tehnika je da pomnožimo vrednosti korisnosti sa verovatnoćom svakog ishoda akcije, i te proizvode sumiramo. Ovo nazivamo očekivanom korisnošću date akcije.
+{jednačina}
+U ovoj jednačini, D predstavlja želju za nekim ishodom, tj korisnost, a P je verovatnoća da će se taj ishod odigrati. Za datu akciju, suma verovatnoća svih ishoda je normalizovana i jednaka 1. Ovaj proces se primenjuje na svaku moguću akciju, da bi se na kraju izabrala ona sa najvećom očekivanom korisnošću. Ovoj je princip maksimalne očekivane korisnosti.
+Na primer zamislimo situaciju da u igri postoje dva moguća ishoda za akciju napada. Neka agent ima 85% šanse da udari metu napada, i neka uspešni napad ima korisnost 0.6, očekivana korisnost za tu akciju bi bila 0.85 * 0.6 = 0,51. Ukoliko bi pretpostavili da postoji akcija napada drugim oružjem, sa verovatnoćom 60% ali sa korisnošću 0.90, njena očekivana korisnost bi bila 0.6 * 0.9 = 0.51. Uprkos manjoj verovatnoći bila bi izabrana druga akcija jer je očekivana korisnost veća.
+4	FAKTORI ODLUČIVANJA
+Retko kad će se donošenje odluke zasnivati na proceni jedne informacije. Faktor odlučivanja predstavlja jednu tu informaciju, jednu tačku razmatranja neke odluke.Primer radi posmatrajmo naručivanje proizvoda putem interneta. Ne razmatramo samo cenu proizvoda već i mogućnost i trajanje dostave, ocene korisnika i razne druge faktore. Svaki od ovih faktora će uticati na odluku da li da poručimo neki proizvod ili ne. Faktori dalje mogu biti modifikovani, tj biće im dodeljena težina( korisnost) koliko utiču na konačnu odluku.
+Jedan način da se ovo postigne je da se izračuna očekivana korisnost iz gornje jednačine za svaki od faktora.Pod pretpostavkom da su vrednosti normirane, možemo iz njih izvući prosek da bismo došli do konačne korisnosti date akcije.
+Ovo nam omogućava da definišemo odluku kao neku kombinaciju njenih faktora. Svaki faktor je izolovan, i za svaku odluku možemo kombinovati koliko faktora želimo.
+
+9.5	 	Računanje korisnosti
+Videli smo kako možemo izračunati korisnost akcije ako znamo njene ishode, ili kombinovanjem raznih faktora odlučivanja.Sledeći korak je da proizvoljnu vrednost iz igre pretvorimo u vrednost korisnosti.Proces dodeljivanja vrednosti korisnosti faktorima odlučivanja je jako subjektivan, dve različite osobe mogu istom faktor različito oceniti.
+Ključno u ovom sistema je razumeti vezu izmedju ulaznog podatka i njegove korisnosti. Zato je potrebno za ulazni podatak pronaći odogvarajuću krivu, funkciju korisnosti. Definisanje ove funkcije tako da dobro oponaša želju je glavni zadatak ovog pristupa.
+Zbog učestalosti javljanja izdvajaju se sledeće funkcije

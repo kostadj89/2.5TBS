@@ -57,6 +57,15 @@ namespace Assets.Scripts.UnitComponents.Attack
             return attackableHexBehaviours;
         }
 
+        public void ResolveDamage(UnitBehaviour target)
+        {
+            //we show targeted unit's ui, and damage it
+            (target).TakeDamage(ParentUnitBehaviour.Damage);
+
+            //damage attacking unit with relation strike damage
+            ParentUnitBehaviour.TakeDamage((int)((target).Damage * 0.5));
+        }
+
         public void StartAttack(ITakesDamage target)
         {
             TargetOfAttack = target;
@@ -64,11 +73,8 @@ namespace Assets.Scripts.UnitComponents.Attack
             if (attackableTiles.Contains(((UnitBehaviour)TargetOfAttack).CurrentHexTile))
             {
                 ParentUnitBehaviour.CurrentState = UnitState.Attacking;
-                //we show targeted unit's ui, and damage it
-                ((UnitBehaviour)TargetOfAttack).TakeDamage(ParentUnitBehaviour.Damage);
-
-                //damage attacking unit with relation strike damage
-                ParentUnitBehaviour.TakeDamage((int)(((UnitBehaviour)TargetOfAttack).Damage * 0.5));
+                
+                ResolveDamage((UnitBehaviour)TargetOfAttack);
 
                 TargetOfAttack = null;
 
@@ -94,7 +100,7 @@ namespace Assets.Scripts.UnitComponents.Attack
                    targetHexBehaviour.OwningTile.ReachableNeighbours.Count() > 0;
         }
 
-        public float CalculateDamageModifiers()
+        public float CalculateDamageModifiers(IIsOnHexGrid target)
         {
             throw new NotImplementedException();
         }

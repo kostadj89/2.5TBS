@@ -42,11 +42,11 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
     #region Fields
 
     //ui
-    private UnitUI unitUI;
+    public UnitUI unitUI;
     //current hex
     private HexBehaviour currentHexTile;
     //animator
-    private Animator animator;
+    public Animator animator;
 
     //Movement, speed will probably be replaced with tilesPerTurn
     public float speed = 0.0025f;
@@ -64,6 +64,7 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
     //when does the unit takes turn
     public int Initiative;
 
+    public int currentStateIndex = 0;
     //attack
     public int attackRange = 1;
     List<UnitBehaviour> enemiesInRange = new List<UnitBehaviour>();
@@ -76,6 +77,8 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
 
     //player
     public int PlayerId;
+    //public uniqueUnitId
+    public int UniqueUnitId;
 
     //movement type
     public MovementType MovementType;
@@ -271,7 +274,7 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
             KillUnit();
             
         }
-        else
+        else if (currentStateIndex==0)//if it's not simulated
         {
             UpdateHealthUI();
         }
@@ -282,12 +285,15 @@ public class UnitBehaviour : MonoBehaviour, IIsOnHexGrid, ITakesDamage
         isAlive = false;
 
         this.currentHexTile.OwningTile.Occupied = false;
+        this.CurrentHexTile.ObjectOnHex = null;
 
-        if (BattlefieldManager.ManagerInstance.InstantiatedUnits.Contains(this.gameObject))
-        {
-            BattlefieldManager.ManagerInstance.InstantiatedUnits.Remove(this.gameObject);
-        }
-        Destroy(this.gameObject);
+        this.gameObject.SetActive(false);
+
+        //if (BattlefieldManager.ManagerInstance.CurrentStateOfGame.InstantiatedUnits.Contains(this.gameObject))
+        //{
+        //    BattlefieldManager.ManagerInstance.CurrentStateOfGame.InstantiatedUnits.Remove(this.gameObject);
+        //}
+        //Destroy(this.gameObject);
     }
 
     #endregion

@@ -1,0 +1,68 @@
+2. Unity
+Unity je razvojno okruženje za pravljenje igara. Zamišljeno je tako da je moguće jednom implementiranu 
+igru kompajlirati i pokretati na različitim platformama. Trenutno su podržane dvadeset i jedna platforma 
+uključujući Windows, Linux, Android, nekoliko generacija Playstation i XBox konzola. Igre je moguće 
+implementirati u jezicima C#, Javascript i Boo. Za svaki od ovih jezika obezbeđen je Unity API [10].
+Za razvoj projekta koji dolazi uz ovaj rad korišćena je besplatna verzija koja je zasnovana na licenci za ličnu 
+upotrebu (eng. Personal Licence) [11].
+U implementaciji algoritama i tehnika korišćene su funkcije i metode koje su deo Unity API-a, u nastavku 
+teksta biće detaljno objašnjene kao i prateći pojmovi.
+2.1. Komponente objekata
+Svaki objekat koji se nalazi sceni pripada baznoj klasi GameObject, preko ove klase moguće je pristupiti 
+svim komponentama objekta [12].
+Svaki objekat koji se nalazi sceni podrazumevano poseduje Collider komponentu i pomoću nje se 
+detektuje fizička interakcija između objekata. Može da bude u obliku nekog geometrijskog tela ili da prati 
+oblike objekta ukoliko je neki složeni model koji je napravljen u nekom programu za modelovanje [13].
+Svaki objekat koji se nalazi na sceni podrazumevano poseduje Transform komponentu i pomoću nje se 
+upravlja pozicijom, rotacijom i skaliranjem objekta. Može da ima roditeljsku Transform komponentu pa se 
+ove funkcije mogu primenjivati hijerarhijski [14].
+Svaki objekat koji se kreće poseduje komponentu Rigidbody koja je zadužena za primenu fizike na objekte. 
+Tu spadaju primena gravitacije, primena sile da bi se objekti kretali, izračunavanje trenutne brzine 
+kretanja, itd [15]
+2.2. Skripte za upravljanje ponašanjem
+U Unity razvojnom okruženju programi koji upravljaju ponašanjem računarski vođenih likova ili bilo kojih 
+drugih objekata u igri nazivaju se skripte. Mogu biti napisane u bilo kom od podržanih jezika i dodeljuju se 
+objektu čijim ponašanjem treba da upravljaju.
+To su uobičajeni C# ili Javascript fajlovi sa ekstenzijama *.cs ili *.js. Za implementiranje skripti sa složenom 
+logikom neophodne su metode Start i Update koje će biti detaljno objašnjene.
+2.3. Metoda Start
+Metoda Start se poziva u prvom frejmu nakon što je skripti omogućeno izvršavanje pre nego što se počne 
+sa pozivanjem metode Update. Izvršavanje se omogućava aktiviranjem bulovske opcije enabled, ako je 
+postavljena na false skripta se neće izvršavati.
+Poziva se tačno jednom u životnom veku skripte. Ako je objekat kome je dodeljena skripta inicijalizovan, 
+a izvršavanje skripte onemogućeno metoda Start neće biti pozvana. Tek kada se omogući izvršavanje 
+skripte metoda će biti pozvana. 
+Ima ulogu sličnu konstruktoru i u njoj se uglavnom inicijalizuju razni parametri i promenljive [16].
+Primer skripte gde se u metodi Start inicijalizuje promenljiva:
+2.4. Metoda Update
+Metoda Update se poziva u svakom frejmu ako je izvršavanje skripte omogućeno. Sa pozivanjem se 
+počinje nakon što je pozvana metoda Start.
+U njoj se implementira logika ponašanja računarski vođenog lika ili bilo kojeg drugog objekta [17].
+Primer skripte gde se u metodi Update objekat translira po z osi:
+Da bi se dobilo vreme koje je proteklo od poslednjeg poziva funkcije Update, koristi se ugrađena metoda
+Time.deltaTime.
+using UnityEngine;
+using System.Collections;
+public class ExampleClass : MonoBehaviour {
+private GameObject target;
+void Start() {
+ target = GameObject.FindWithTag("Player");
+}
+}
+using UnityEngine;
+using System.Collections;
+public class ExampleClass : MonoBehaviour {
+ void Update() {
+ transform.Translate(0, 0, Time.deltaTime * 1);
+ }
+}
+Neki algoritmi za veštačku inteligenciju u igrama
+9
+2.5. Metoda OnTriggerEnter
+Metoda OnTriggerEnter kao argument prima Collider objekta koji se dodiruje sa Collider-om objekta na 
+kome se nalazi skripta. U trenutku kada se dodirnu Collider-i šalje se poruka o događaju i počinje se sa 
+izvršavanjem metode [18].
+Primer skripte gde se u metodi OnTriggerEnter uništava objekat:
+2.6. Ostali važni pojmovi
+Vector3 služi za predstavljanje 3D vektora i tačaka. Ova struktura se koristi za čuvanje i prenošenje 3D 
+pozicija, takođe sadrži metode za rad sa vektorskim operacijama [19].

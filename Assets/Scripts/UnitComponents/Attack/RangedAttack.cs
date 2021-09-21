@@ -11,7 +11,7 @@ namespace Assets.Scripts.UnitComponents.Attack
 {
     class RangedAttack : IAttackComponent
     {
-        private bool IsEngagedInMelee;
+        public bool IsEngagedInMelee;
         public UnitBehaviour ParentUnitBehaviour { get; set; }
         public ITakesDamage TargetOfAttack { get; set; }
         public int AttackRange
@@ -60,6 +60,19 @@ namespace Assets.Scripts.UnitComponents.Attack
             return currAttackRange;
         }
 
+        public void ResolveDamage(UnitBehaviour target)
+        {
+            int calculatedDamage = (int)(CalculateDamageBonuses() * CalculateDamageModifiers(target));
+            //we show targeted unit's ui, and damage it
+            target.TakeDamage(calculatedDamage);
+            Debug.Log(string.Format("Enemy {0}, takes {1}", target.ToString(), calculatedDamage));
+            //damage attacking unit with relation strike damage
+            if (IsEngagedInMelee)
+            {
+                ParentUnitBehaviour.TakeDamage((int)(target.Damage * 0.5));
+            }
+        }
+
         public void StartAttack(ITakesDamage target)
         {
             TargetOfAttack = target;
@@ -67,15 +80,8 @@ namespace Assets.Scripts.UnitComponents.Attack
             if (attackableTiles.Contains(((UnitBehaviour)TargetOfAttack).CurrentHexTile))
             {
                 ParentUnitBehaviour.CurrentState = UnitState.Attacking;
-                int calculatedDamage = (int)(CalculateDamageBonuses() * CalculateDamageModifiers());
-                //we show targeted unit's ui, and damage it
-                ((UnitBehaviour)TargetOfAttack).TakeDamage(calculatedDamage);
-                Debug.Log(string.Format("Enemy {0}, takes {1}", ((UnitBehaviour)TargetOfAttack).ToString(), calculatedDamage));
-                //damage attacking unit with relation strike damage
-                if (IsEngagedInMelee)
-                {
-                    ParentUnitBehaviour.TakeDamage((int)(((UnitBehaviour)TargetOfAttack).Damage * 0.5));
-                }
+
+                ResolveDamage((UnitBehaviour)TargetOfAttack);
 
                 TargetOfAttack = null;
 
@@ -94,7 +100,7 @@ namespace Assets.Scripts.UnitComponents.Attack
         }
 
         //returns factor for multiplication
-        public float CalculateDamageModifiers()
+        public float CalculateDamageModifiers(IIsOnHexGrid target)
         {
             float tempAttackModifier = 1;
 
@@ -108,10 +114,10 @@ namespace Assets.Scripts.UnitComponents.Attack
             {
                 //()
                 List<HexTile> coversTiles =
-                    ((IIsOnHexGrid)TargetOfAttack).CurrentHexTile.OwningTile.AllNeighbours.Where(x =>
+                    (target).CurrentHexTile.OwningTile.AllNeighbours.Where(x =>
                        x.Occupied == true || x.Cover == true).ToList();
 
-                tempAttackModifier = GetCoverModifier(((IIsOnHexGrid)TargetOfAttack).CurrentHexTile.OwningTile, ParentUnitBehaviour.CurrentHexTile.OwningTile, coversTiles);
+                tempAttackModifier = GetCoverModifier((target).CurrentHexTile.OwningTile, ParentUnitBehaviour.CurrentHexTile.OwningTile, coversTiles);
             }
 
             return tempAttackModifier;
